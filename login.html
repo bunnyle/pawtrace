@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PawTrace AI — 登录</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Inter:wght@300;400;500;600&display=swap"
+        rel="stylesheet" />
+    <style>
+        :root {
+            --bg: #0D0D1A;
+            --surface: #141427;
+            --surface2: #1C1C35;
+            --border: rgba(199, 125, 255, 0.18);
+            --pink: #FF6B9D;
+            --purple: #C77DFF;
+            --teal: #00D4B1;
+            --text: #F0EEFF;
+            --text-muted: #8B87B0;
+            --radius: 20px;
+            --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        /* Background orbs */
+        .orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .orb-1 {
+            width: 500px;
+            height: 500px;
+            background: rgba(199, 125, 255, 0.12);
+            top: -100px;
+            left: -100px;
+        }
+
+        .orb-2 {
+            width: 400px;
+            height: 400px;
+            background: rgba(255, 107, 157, 0.1);
+            bottom: -100px;
+            right: -100px;
+        }
+
+        .login-wrap {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 440px;
+            padding: 24px;
+        }
+
+        /* Logo */
+        .login-logo {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .login-logo .paw {
+            font-size: 2.5rem;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .logo-text {
+            font-family: 'Nunito', sans-serif;
+            font-weight: 900;
+            font-size: 1.8rem;
+        }
+
+        .logo-ai {
+            background: linear-gradient(90deg, var(--pink), var(--purple));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .login-tagline {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            margin-top: 6px;
+        }
+
+        /* Card */
+        .login-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 40px;
+            box-shadow: 0 24px 80px rgba(0, 0, 0, 0.4);
+        }
+
+        .card-title {
+            font-family: 'Nunito', sans-serif;
+            font-weight: 800;
+            font-size: 1.3rem;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+
+        .card-sub {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        /* Mode badge */
+        .mode-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            padding: 4px 12px;
+            border-radius: 100px;
+            margin: 0 auto 24px;
+        }
+
+        .mode-badge.setup {
+            color: var(--teal);
+            background: rgba(0, 212, 177, 0.12);
+            border: 1px solid rgba(0, 212, 177, 0.25);
+        }
+
+        .mode-badge.login {
+            color: var(--purple);
+            background: rgba(199, 125, 255, 0.12);
+            border: 1px solid rgba(199, 125, 255, 0.25);
+        }
+
+        .mode-badge-wrap {
+            text-align: center;
+        }
+
+        /* Form */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-input {
+            width: 100%;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 12px 16px;
+            color: var(--text);
+            font-size: 0.95rem;
+            outline: none;
+            font-family: 'Inter', sans-serif;
+            transition: border-color var(--transition), box-shadow var(--transition);
+        }
+
+        .form-input:focus {
+            border-color: var(--purple);
+            box-shadow: 0 0 0 3px rgba(199, 125, 255, 0.12);
+        }
+
+        .form-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .password-wrap {
+            position: relative;
+        }
+
+        .toggle-pw {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 1rem;
+            padding: 4px;
+            transition: color var(--transition);
+        }
+
+        .toggle-pw:hover {
+            color: var(--text);
+        }
+
+        .btn-login {
+            width: 100%;
+            background: linear-gradient(135deg, var(--pink), var(--purple));
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            padding: 14px;
+            font-family: 'Nunito', sans-serif;
+            font-weight: 800;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-top: 8px;
+            transition: opacity var(--transition), transform var(--transition);
+            box-shadow: 0 4px 24px rgba(255, 107, 157, 0.35);
+        }
+
+        .btn-login:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .btn-login:active {
+            transform: translateY(0);
+        }
+
+        .btn-login:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Error */
+        .login-error {
+            display: none;
+            background: rgba(255, 107, 157, 0.12);
+            border: 1px solid rgba(255, 107, 157, 0.3);
+            border-radius: 10px;
+            padding: 10px 14px;
+            font-size: 0.85rem;
+            color: var(--pink);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .login-error.show {
+            display: block;
+        }
+
+        /* Hint */
+        .login-hint {
+            text-align: center;
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            margin-top: 20px;
+        }
+
+        .login-hint a {
+            color: var(--purple);
+            text-decoration: none;
+        }
+
+        .login-hint a:hover {
+            text-decoration: underline;
+        }
+
+        /* Loading spinner */
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+            vertical-align: middle;
+            margin-right: 6px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+
+    <div class="login-wrap">
+        <!-- Logo -->
+        <div class="login-logo">
+            <span class="paw">🐾</span>
+            <div class="logo-text">PawTrace <span class="logo-ai">AI</span></div>
+            <div class="login-tagline">把毛孩变成永恒的木刻艺术</div>
+        </div>
+
+        <!-- Card -->
+        <div class="login-card">
+            <div class="mode-badge-wrap">
+                <span class="mode-badge" id="modeBadge">⚙️ 初始设置</span>
+            </div>
+            <h2 class="card-title" id="cardTitle">创建管理员账户</h2>
+            <p class="card-sub" id="cardSub">首次使用，请设置您的管理员用户名和密码</p>
+
+            <div class="login-error" id="loginError"></div>
+
+            <form id="loginForm" onsubmit="handleSubmit(event)">
+                <div class="form-group">
+                    <label for="username">用户名</label>
+                    <input type="text" id="username" class="form-input" placeholder="输入用户名" autocomplete="username"
+                        required />
+                </div>
+                <div class="form-group" id="confirmGroup" style="display:none;">
+                    <label for="confirmUsername">确认用户名</label>
+                    <input type="text" id="confirmUsername" class="form-input" placeholder="再次输入用户名"
+                        autocomplete="username" />
+                </div>
+                <div class="form-group">
+                    <label for="password">密码</label>
+                    <div class="password-wrap">
+                        <input type="password" id="password" class="form-input" placeholder="输入密码（至少 8 位）"
+                            autocomplete="current-password" required />
+                        <button type="button" class="toggle-pw" onclick="togglePassword()">👁</button>
+                    </div>
+                </div>
+                <div class="form-group" id="confirmPwGroup" style="display:none;">
+                    <label for="confirmPassword">确认密码</label>
+                    <div class="password-wrap">
+                        <input type="password" id="confirmPassword" class="form-input" placeholder="再次输入密码"
+                            autocomplete="new-password" />
+                        <button type="button" class="toggle-pw" onclick="togglePassword('confirmPassword')">👁</button>
+                    </div>
+                </div>
+                <button type="submit" class="btn-login" id="submitBtn">登录</button>
+            </form>
+
+            <p class="login-hint" id="loginHint">
+                忘记密码？<a href="javascript:resetAccount()">重置所有数据</a>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // ── Auth State ──────────────────────────────────
+        const USERS_KEY = 'pawtrace_users';
+        const SESSION_KEY = 'pawtrace_session';
+
+        // If already logged in, redirect to app
+        const existingSession = localStorage.getItem(SESSION_KEY);
+        if (existingSession) {
+            const users = JSON.parse(localStorage.getItem(USERS_KEY) || '[]');
+            const session = JSON.parse(existingSession);
+            const user = users.find(u => u.username === session.username);
+            if (user && session.expires > Date.now()) {
+                window.location.href = 'index.html';
+            } else {
+                localStorage.removeItem(SESSION_KEY);
+            }
+        }
+
+        // Check if is first time setup or login mode
+        const users = JSON.parse(localStorage.getItem(USERS_KEY) || '[]');
+        const isSetup = users.length === 0;
+
+        if (!isSetup) {
+            // Login mode
+            document.getElementById('modeBadge').textContent = '🔑 账户登录';
+            document.getElementById('modeBadge').classList.remove('setup');
+            document.getElementById('modeBadge').classList.add('login');
+            document.getElementById('cardTitle').textContent = '欢迎回来';
+            document.getElementById('cardSub').textContent = '请登录您的 PawTrace AI 账户';
+            document.getElementById('submitBtn').textContent = '登录 →';
+            document.getElementById('loginHint').style.display = 'block';
+        } else {
+            // Setup mode
+            document.getElementById('confirmGroup').style.display = 'block';
+            document.getElementById('confirmPwGroup').style.display = 'block';
+            document.getElementById('submitBtn').textContent = '创建账户 →';
+            document.getElementById('loginHint').style.display = 'none';
+            document.getElementById('password').placeholder = '设置密码（至少 8 位）';
+        }
+
+        // ── SHA-256 Hash ────────────────────────────────
+        async function sha256(message) {
+            const msgBuffer = new TextEncoder().encode(message);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        // ── Form Submit ─────────────────────────────────
+        async function handleSubmit(e) {
+            e.preventDefault();
+            const btn = document.getElementById('submitBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span>处理中...';
+            hideError();
+
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+
+            try {
+                if (isSetup) {
+                    await handleSetup(username, password);
+                } else {
+                    await handleLogin(username, password);
+                }
+            } catch (err) {
+                showError(err.message);
+                btn.disabled = false;
+                btn.textContent = isSetup ? '创建账户 →' : '登录 →';
+            }
+        }
+
+        async function handleSetup(username, password) {
+            if (!username || username.length < 2) throw new Error('用户名至少需要 2 个字符');
+            if (password.length < 8) throw new Error('密码至少需要 8 位');
+
+            const confirmUsername = document.getElementById('confirmUsername').value.trim();
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            if (username !== confirmUsername) throw new Error('两次输入的用户名不一致');
+            if (password !== confirmPassword) throw new Error('两次输入的密码不一致');
+
+            const hash = await sha256(password + username + 'pawtrace_salt');
+            const newUser = { username, hash, role: 'admin', createdAt: Date.now() };
+            localStorage.setItem(USERS_KEY, JSON.stringify([newUser]));
+
+            await createSession(username);
+            window.location.href = 'index.html';
+        }
+
+        async function handleLogin(username, password) {
+            const users = JSON.parse(localStorage.getItem(USERS_KEY) || '[]');
+            const hash = await sha256(password + username + 'pawtrace_salt');
+            const user = users.find(u => u.username === username && u.hash === hash);
+
+            if (!user) throw new Error('用户名或密码错误');
+
+            await createSession(username);
+
+            // Redirect: admin goes to admin, regular user goes to app
+            if (user.role === 'admin') {
+                window.location.href = 'index.html';
+            } else {
+                window.location.href = 'index.html';
+            }
+        }
+
+        async function createSession(username) {
+            const session = {
+                username,
+                expires: Date.now() + 7 * 24 * 60 * 60 * 1000 // 7 days
+            };
+            localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+        }
+
+        // ── UI Helpers ──────────────────────────────────
+        function showError(msg) {
+            const el = document.getElementById('loginError');
+            el.textContent = '⚠️ ' + msg;
+            el.classList.add('show');
+        }
+        function hideError() {
+            document.getElementById('loginError').classList.remove('show');
+        }
+        function togglePassword(id = 'password') {
+            const input = document.getElementById(id);
+            input.type = input.type === 'password' ? 'text' : 'password';
+        }
+        function resetAccount() {
+            if (confirm('⚠️ 这将清除所有账户数据和历史记录。确认重置？')) {
+                if (confirm('再次确认：所有数据将永久删除，无法恢复！')) {
+                    ['pawtrace_users', 'pawtrace_session', 'pawtrace_history', 'pawtrace_apikey'].forEach(k => localStorage.removeItem(k));
+                    window.location.reload();
+                }
+            }
+        }
+    </script>
+</body>
+
+</html>

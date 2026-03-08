@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PawTrace AI — 把毛孩变成激光雕刻艺术</title>
+    <meta name="description" content="上传猫狗照片，AI自动生成超萌圆形矢量SVG图案，专为镭射雕刻机（xTool F2 Ultra）优化。" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Inter:wght@300;400;500;600&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+
+    <div class="paw-bg" aria-hidden="true">
+        <span class="paw">🐾</span><span class="paw">🐾</span><span class="paw">🐾</span>
+        <span class="paw">🐾</span><span class="paw">🐾</span><span class="paw">🐾</span>
+        <span class="paw">🐾</span><span class="paw">🐾</span>
+    </div>
+
+    <nav class="navbar">
+        <div class="nav-inner">
+            <a href="#" class="nav-logo">
+                <span class="logo-paw">🐾</span>
+                <span class="logo-text">PawTrace <span class="logo-ai">AI</span></span>
+            </a>
+            <div class="nav-links">
+                <a href="#how-it-works">流程</a>
+                <a href="#laser-info">xTool 兼容</a>
+                <a href="#generate" class="nav-cta">立即生成 →</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero" id="hero">
+        <div class="hero-content">
+            <div class="hero-badge">✨ AI 驱动 · SVG 输出 · 镭射雕刻就绪</div>
+            <h1 class="hero-title">
+                把毛孩变成<br />
+                <em class="hero-highlight">永恒的木刻艺术</em>
+            </h1>
+            <p class="hero-sub">
+                上传猫猫或狗狗的照片，AI 自动生成超萌圆形矢量图，<br />直接用于 <strong>xTool F2 Ultra</strong> 镭射雕刻机刻在木板上。
+            </p>
+            <div class="hero-actions">
+                <a href="#generate" class="btn-primary">开始创作 🚀</a>
+                <a href="#how-it-works" class="btn-ghost">了解流程</a>
+            </div>
+            <div class="hero-stats">
+                <div class="stat"><span class="stat-n">3步</span><span class="stat-l">快速完成</span></div>
+                <div class="stat-div"></div>
+                <div class="stat"><span class="stat-n">SVG</span><span class="stat-l">矢量格式</span></div>
+                <div class="stat-div"></div>
+                <div class="stat"><span class="stat-n">xTool</span><span class="stat-l">优化输出</span></div>
+            </div>
+        </div>
+        <div class="hero-visual">
+            <div class="hero-ring hero-ring-1"></div>
+            <div class="hero-ring hero-ring-2"></div>
+            <div class="hero-badge-circle">
+                <div class="badge-inner">
+                    <span class="badge-emoji">🐱</span>
+                    <span class="badge-arrow">→</span>
+                    <span class="badge-svg">SVG</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- HOW IT WORKS -->
+    <section class="how-it-works" id="how-it-works">
+        <div class="container">
+            <div class="section-label">How It Works</div>
+            <h2 class="section-title">三步完成，超简单</h2>
+            <div class="steps-grid">
+                <div class="step-card">
+                    <div class="step-num">01</div>
+                    <div class="step-icon">📸</div>
+                    <h3>上传照片</h3>
+                    <p>拖拽或点击上传猫猫/狗狗照片，支持 JPG、PNG、HEIC，建议正面清晰图</p>
+                </div>
+                <div class="step-arrow">→</div>
+                <div class="step-card">
+                    <div class="step-num">02</div>
+                    <div class="step-icon">🤖</div>
+                    <h3>AI 转换</h3>
+                    <p>GPT-4o 识别宠物特征，DALL-E 3 生成超萌黑白圆形插画，自动矢量化</p>
+                </div>
+                <div class="step-arrow">→</div>
+                <div class="step-card">
+                    <div class="step-num">03</div>
+                    <div class="step-icon">⚡</div>
+                    <h3>下载 & 雕刻</h3>
+                    <p>下载 SVG 文件，导入 xTool Creative Space，调好参数，开始雕刻！</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- TOOL -->
+    <section class="tool-section" id="generate">
+        <div class="container">
+            <div class="section-label">开始创作</div>
+            <h2 class="section-title">上传你的毛孩照片</h2>
+
+            <!-- API KEY -->
+            <div class="api-setup" id="apiSetup">
+                <div class="api-header" onclick="toggleApiPanel()">
+                    <div class="api-title-row">
+                        <span>🔑 Google AI Studio API Key</span>
+                        <span class="api-status" id="apiStatus">未设置</span>
+                    </div>
+                    <span class="api-toggle" id="apiToggle">▼</span>
+                </div>
+                <div class="api-body" id="apiBody">
+                    <p class="api-hint">Key 仅存储在浏览器本地，不会上传至任何服务器。🔒</p>
+                    <div class="api-input-row">
+                        <input type="password" id="apiKeyInput" placeholder="AIza..." class="api-input" />
+                        <button class="btn-save" onclick="saveApiKey()">保存</button>
+                    </div>
+                    <p class="api-hint-sm">没有 API Key？<a href="https://aistudio.google.com/app/apikey"
+                            target="_blank">前往 Google AI Studio 获取 →</a></p>
+                </div>
+            </div>
+
+            <!-- UPLOAD -->
+            <div class="upload-zone" id="uploadZone" ondragover="handleDragOver(event)"
+                ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)"
+                onclick="document.getElementById('fileInput').click()">
+                <input type="file" id="fileInput" accept="image/*" style="display:none"
+                    onchange="handleFileSelect(event)" />
+                <div class="upload-content" id="uploadContent">
+                    <div class="upload-icon">📁</div>
+                    <p class="upload-title">拖拽照片到这里，或点击上传</p>
+                    <p class="upload-sub">支持 JPG · PNG · HEIC · WEBP</p>
+                    <p class="upload-hint">建议：正面、清晰、光线充足的照片效果最佳 🐾</p>
+                </div>
+                <div class="upload-preview" id="uploadPreview" style="display:none">
+                    <img id="previewImg" src="" alt="上传的照片" />
+                    <div class="preview-overlay"><span>点击更换照片</span></div>
+                </div>
+            </div>
+
+            <!-- STYLE -->
+            <div class="style-section-inner">
+                <h3 class="style-title">选择风格</h3>
+                <div class="style-grid">
+                    <div class="style-card active" id="style-kawaii" onclick="selectStyle('kawaii')">
+                        <div class="style-preview kawaii-preview">
+                            <div class="kawaii-face">
+                                <div class="k-eyes"><span>◉</span><span>◉</span></div>
+                                <div class="k-mouth">ω</div>
+                            </div>
+                        </div>
+                        <div class="style-info">
+                            <h4>超萌圆圆风 🌸</h4>
+                            <p>大眼睛、圆脸、卡哇伊</p>
+                        </div>
+                        <div class="style-check">✓</div>
+                    </div>
+                    <div class="style-card" id="style-minimal" onclick="selectStyle('minimal')">
+                        <div class="style-preview minimal-preview">
+                            <div class="min-art">
+                                <div class="min-circle-big"></div>
+                                <div class="min-line"></div>
+                                <div class="min-line"></div>
+                            </div>
+                        </div>
+                        <div class="style-info">
+                            <h4>简约线条风 ✏️</h4>
+                            <p>极简几何、干净线条</p>
+                        </div>
+                        <div class="style-check">✓</div>
+                    </div>
+                    <div class="style-card" id="style-stamp" onclick="selectStyle('stamp')">
+                        <div class="style-preview stamp-preview">
+                            <div class="stamp-ring-demo">
+                                <span class="stamp-emoji">🐾</span>
+                            </div>
+                        </div>
+                        <div class="style-info">
+                            <h4>复古印章风 🏮</h4>
+                            <p>圆形印章、vintage 质感</p>
+                        </div>
+                        <div class="style-check">✓</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SETTINGS -->
+            <div class="settings-row">
+                <div class="setting-item">
+                    <label>输出尺寸</label>
+                    <select id="outputSize" class="select-input">
+                        <option value="50">50mm × 50mm（小号）</option>
+                        <option value="80" selected>80mm × 80mm（推荐）</option>
+                        <option value="100">100mm × 100mm（大号）</option>
+                        <option value="150">150mm × 150mm（装饰板）</option>
+                    </select>
+                </div>
+                <div class="setting-item">
+                    <label>对比度增强</label>
+                    <select id="contrastLevel" class="select-input">
+                        <option value="normal">标准</option>
+                        <option value="high" selected>高对比（推荐雕刻）</option>
+                        <option value="ultra">超高对比（简化）</option>
+                    </select>
+                </div>
+                <div class="setting-item">
+                    <label>边框样式</label>
+                    <select id="borderStyle" class="select-input">
+                        <option value="single">单圆圈</option>
+                        <option value="double" selected>双圆圈</option>
+                        <option value="dotted">点线圆圈</option>
+                        <option value="none">无边框</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- CUSTOM TEXT -->
+            <div class="custom-text-section">
+                <h3 class="style-title">✍️ 自定义文字（刻在底部）</h3>
+                <div class="text-inputs-row">
+                    <div class="text-input-group">
+                        <label for="petName">宠物名字</label>
+                        <input type="text" id="petName" placeholder="例：COOPER" maxlength="20" class="text-field" />
+                    </div>
+                    <div class="text-input-group">
+                        <label for="petTagline">副标题（可留空）</label>
+                        <input type="text" id="petTagline" placeholder="例：Home is where the dog is" maxlength="40"
+                            class="text-field" />
+                    </div>
+                </div>
+                <p class="text-hint">💡 文字会以 SVG &lt;text&gt; 元素输出，可在 xTool Creative Space 中自由更改字体和大小</p>
+            </div>
+
+            <div class="generate-area">
+                <button class="btn-generate" id="generateBtn" onclick="generateSVG()">
+                    <span class="btn-gen-icon">✨</span>
+                    <span class="btn-gen-text">AI 生成 SVG</span>
+                    <span class="btn-gen-sub">约需 15-30 秒</span>
+                </button>
+                <p class="generate-hint">Google Gemini 分析 + Nano Banana 生成 · 约需 20-40 秒</p>
+            </div>
+
+            <!-- PROGRESS -->
+            <div class="progress-section" id="progressSection" style="display:none">
+                <div class="progress-steps">
+                    <div class="prog-step" id="prog1">
+                        <div class="prog-dot"></div><span>🔍 Gemini 分析宠物特征...</span>
+                    </div>
+                    <div class="prog-step" id="prog2">
+                        <div class="prog-dot"></div><span>🍌 Nano Banana 生成萌图...</span>
+                    </div>
+                    <div class="prog-step" id="prog3">
+                        <div class="prog-dot"></div><span>✏️ 矢量转换为 SVG...</span>
+                    </div>
+                    <div class="prog-step" id="prog4">
+                        <div class="prog-dot"></div><span>⚡ 优化镭射雕刻参数...</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="error-box" id="errorBox" style="display:none">
+                <span>⚠️</span><span id="errorMsg">发生错误，请重试</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- RESULTS -->
+    <section class="results-section" id="resultsSection" style="display:none">
+        <div class="container">
+            <div class="section-label">生成完成 🎉</div>
+            <h2 class="section-title">你的专属毛孩 SVG</h2>
+            <div class="results-grid">
+                <div class="result-card">
+                    <div class="result-label">📸 原始照片</div>
+                    <div class="result-frame"><img id="resultOriginal" src="" alt="原始照片" /></div>
+                </div>
+                <div class="result-card">
+                    <div class="result-label">🎨 AI 生成插画</div>
+                    <div class="result-frame result-frame-ai"><img id="resultGenerated" src="" alt="AI生成图" /></div>
+                </div>
+                <div class="result-card result-card-main">
+                    <div class="result-label">✨ SVG 矢量图</div>
+                    <div class="result-frame result-frame-svg" id="svgPreviewFrame">
+                        <div id="svgPreview"></div>
+                    </div>
+                    <div class="result-badges">
+                        <span class="info-badge" id="svgSizeBadge">80mm × 80mm</span>
+                        <span class="info-badge">xTool F2 Ultra</span>
+                        <span class="info-badge">黑白矢量</span>
+                    </div>
+                    <div class="download-row">
+                        <button class="btn-download" onclick="downloadSVG()">⬇️ 下载 SVG 文件</button>
+                        <button class="btn-regen" onclick="regenSVG()">🔄 重新生成</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Laser Tips -->
+            <div class="laser-tips">
+                <div class="tips-header"><span>⚡</span>
+                    <h3>xTool F2 Ultra 雕刻参数建议</h3>
+                </div>
+                <div class="tips-grid">
+                    <div class="tip-item">
+                        <div class="tip-label">木材种类</div>
+                        <div class="tip-val">椴木板 / 桦木板</div>
+                        <div class="tip-note">3-5mm</div>
+                    </div>
+                    <div class="tip-item">
+                        <div class="tip-label">功率</div>
+                        <div class="tip-val">40-60%</div>
+                        <div class="tip-note">先用 40% 测试</div>
+                    </div>
+                    <div class="tip-item">
+                        <div class="tip-label">速度</div>
+                        <div class="tip-val">300-500 mm/s</div>
+                        <div class="tip-note">越慢越深</div>
+                    </div>
+                    <div class="tip-item">
+                        <div class="tip-label">DPI</div>
+                        <div class="tip-val">254 DPI</div>
+                        <div class="tip-note">细节雕刻</div>
+                    </div>
+                    <div class="tip-item">
+                        <div class="tip-label">模式</div>
+                        <div class="tip-val">向量填充</div>
+                        <div class="tip-note">SVG 导入后选择</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- LASER INFO -->
+    <section class="laser-info-section" id="laser-info">
+        <div class="container">
+            <div class="laser-card">
+                <div class="laser-left">
+                    <div class="section-label">设备兼容</div>
+                    <h2>专为 xTool F2 Ultra 优化</h2>
+                    <p>SVG 输出格式天然兼容 xTool Creative Space，导入即用。</p>
+                    <ul class="laser-features">
+                        <li>✅ 标准 SVG 路径格式，xTool 完美识别</li>
+                        <li>✅ 黑白分离，自动识别雕刻区域</li>
+                        <li>✅ 包含切割圆圈路径（边框）</li>
+                        <li>✅ 精确 mm 单位输出，无需缩放</li>
+                        <li>✅ 兼容 F1、F1 Ultra、F2 全系列</li>
+                    </ul>
+                </div>
+                <div class="laser-right">
+                    <div class="laser-badge-box">
+                        <div class="laser-badge-ring">
+                            <div class="laser-badge-content">
+                                <span class="laser-z">⚡</span>
+                                <span class="laser-brand">xTool</span>
+                                <span class="laser-model">F2 Ultra</span>
+                                <span class="laser-compat">兼容认证</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-inner">
+                <div class="footer-brand">
+                    <span>🐾</span>
+                    <span class="logo-text">PawTrace <span class="logo-ai">AI</span></span>
+                </div>
+                <p class="footer-sub">将毛孩的瞬间，化为永恒的木刻记忆</p>
+                <p class="footer-note">API Key 仅在浏览器本地使用，绝不上传 · 基于 Google Gemini Flash + Nano Banana 图像生成</p>
+            </div>
+        </div>
+    </footer>
+
+    <canvas id="processingCanvas" style="display:none"></canvas>
+    <script src="https://cdn.jsdelivr.net/npm/imagetracerjs@1.2.6/imagetracer_v1.2.6.js"></script>
+    <script src="app.js"></script>
+</body>
+
+</html>

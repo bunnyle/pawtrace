@@ -679,21 +679,19 @@ async function downloadSVG() {
             console.warn('showSaveFilePicker failed, falling back:', e.message);
         }
     }
-
-    // Fallback: open SVG in new tab — user can File > Save As to save with correct filename
+    // Fallback: use an anchor tag to force download
     const url = URL.createObjectURL(svgBlob);
-    const tab = window.open(url, '_blank');
-    if (tab) {
-        if (tab.document) tab.document.title = filename;
-        setTimeout(() => URL.revokeObjectURL(url), 30000);
-        // Show instruction
-        setTimeout(() => {
-            alert(`SVG 已在新标签页打开。\n请按 Cmd+S（Mac）或 Ctrl+S（Windows）另存为 "${filename}"`);
-        }, 500);
-    } else {
-        alert('请允许弹出窗口以下载 SVG 文件');
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+
+    // Cleanup
+    setTimeout(() => {
+        document.body.removeChild(a);
         URL.revokeObjectURL(url);
-    }
+    }, 1000);
 }
 
 function regenSVG() {

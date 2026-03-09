@@ -102,7 +102,7 @@ let allItems = [];
 let activeFilter = 'all';
 let modalItem = null;
 
-const styleLabels = { kawaii: 'Chibi 🌸', minimal: '简约 ✏️', stamp: '印章 🏮' };
+const styleLabels = { kawaii: 'Chibi 🌸', minimal: '简约 ✏️', stamp: '印章 🏮', floral: '扁平花环 🌿' };
 
 // ── Render ────────────────────────────────────────────────
 async function loadGallery() {

@@ -246,7 +246,8 @@ Be very specific. Use descriptive adjectives. Max 120 words. This description wi
 const stylePrompts = {
     kawaii: 'chibi cartoon style: oversized round head (fills top 60% of circle), big expressive eyes with bold black outlines, simplified cute features, THICK BLACK OUTLINES (3-4px minimum), solid black filled areas for shadows/pupils/nose, high-contrast black-and-white only, like a bold stamp or woodblock print',
     minimal: 'bold silhouette portrait: clean thick strokes outlining the pet face and key features (eyes, ears, nose), solid black fills for dark areas and shadows, enough detail to clearly recognize the breed face, bold linocut/woodcut style — NOT sparse, strokes must be thick enough to engrave',
-    stamp: 'vintage rubber stamp / woodcut engraving style: bold thick black ink outlines, solid black fills on fur texture and shadow areas, white negative space, circular composition with double border ring, retro engraved aesthetic, every element must be bold and clear for laser engraving'
+    stamp: 'vintage rubber stamp / woodcut engraving style: bold thick black ink outlines, solid black fills on fur texture and shadow areas, white negative space, circular composition with double border ring, retro engraved aesthetic, every element must be bold and clear for laser engraving',
+    floral: 'flat vector illustration style: centered pet portrait keeping realistic face shape, ear structure, and fur color distribution. Uses clean, solid color blocks (4-6 simplified colors only), soft curved edges, and large bright eyes with highlights. Surrounded by a gentle botanical wreath of leaves, wildflowers, daisies, and lavender in soft, elegant pale tones. White background, overall cute and clean aesthetic.'
 };
 
 // ── Nano Banana Image-to-Image: Generate Cute Art from original photo ──

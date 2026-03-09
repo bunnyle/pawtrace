@@ -729,7 +729,7 @@ body {
 
 .style-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 16px;
 }
 
@@ -820,6 +820,50 @@ body {
     align-items: center;
     justify-content: center;
     font-size: 2rem;
+}
+
+.floral-preview {
+    background: #E8F5E9;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.floral-ring {
+    width: 64px;
+    height: 64px;
+    border: 3px solid #81C784;
+    border-radius: 50%;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fff;
+    box-shadow: 0 4px 12px rgba(129, 199, 132, 0.3);
+}
+
+.floral-ring::before,
+.floral-ring::after {
+    content: "🌿";
+    position: absolute;
+    font-size: 1.2rem;
+}
+
+.floral-ring::before {
+    top: -10px;
+    left: 5px;
+    transform: rotate(-30deg);
+}
+
+.floral-ring::after {
+    bottom: -10px;
+    right: 5px;
+    transform: rotate(150deg);
+}
+
+.floral-center {
+    font-size: 1.4rem;
 }
 
 .style-info {

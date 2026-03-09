@@ -109,25 +109,6 @@
             <div class="section-label">开始创作</div>
             <h2 class="section-title">上传你的毛孩照片</h2>
 
-            <!-- API KEY -->
-            <div class="api-setup" id="apiSetup">
-                <div class="api-header" onclick="toggleApiPanel()">
-                    <div class="api-title-row">
-                        <span>🔑 Google AI Studio API Key</span>
-                        <span class="api-status" id="apiStatus">未设置</span>
-                    </div>
-                    <span class="api-toggle" id="apiToggle">▼</span>
-                </div>
-                <div class="api-body" id="apiBody">
-                    <p class="api-hint">Key 仅存储在浏览器本地，不会上传至任何服务器。🔒</p>
-                    <div class="api-input-row">
-                        <input type="password" id="apiKeyInput" placeholder="AIza..." class="api-input" />
-                        <button class="btn-save" onclick="saveApiKey()">保存</button>
-                    </div>
-                    <p class="api-hint-sm">没有 API Key？<a href="https://aistudio.google.com/app/apikey"
-                            target="_blank">前往 Google AI Studio 获取 →</a></p>
-                </div>
-            </div>
 
             <!-- UPLOAD -->
             <div class="upload-zone" id="uploadZone" ondragover="handleDragOver(event)"

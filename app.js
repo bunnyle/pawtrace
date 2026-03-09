@@ -38,40 +38,9 @@ window.addEventListener('DOMContentLoaded', () => {
         const session = JSON.parse(sessionStr);
         addNavUserChip(session.username);
     }
-
-    const saved = localStorage.getItem('pawtrace_apikey');
-    if (saved) {
-        document.getElementById('apiKeyInput').value = saved;
-        updateApiStatus(true);
-    }
 });
 
-// ── API Key ────────────────────────────────────
-function toggleApiPanel() {
-    apiKeyPanelOpen = !apiKeyPanelOpen;
-    const body = document.getElementById('apiBody');
-    const toggle = document.getElementById('apiToggle');
-    body.style.display = apiKeyPanelOpen ? 'block' : 'none';
-    toggle.classList.toggle('open', apiKeyPanelOpen);
-}
-
-function saveApiKey() {
-    const key = document.getElementById('apiKeyInput').value.trim();
-    if (key.length < 20) {
-        showError('请输入有效的 Google AI Studio API Key');
-        return;
-    }
-    localStorage.setItem('pawtrace_apikey', key);
-    updateApiStatus(true);
-    // Close panel after saving
-    if (apiKeyPanelOpen) toggleApiPanel();
-}
-
-function updateApiStatus(isSet) {
-    const el = document.getElementById('apiStatus');
-    el.textContent = isSet ? '✓ 已设置' : '未设置';
-    el.className = isSet ? 'api-status set' : 'api-status';
-}
+// ── UI Helpers ─────────────────────────────────
 
 function getApiKey() {
     return localStorage.getItem('pawtrace_apikey') || '';

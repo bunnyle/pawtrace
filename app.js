@@ -167,8 +167,11 @@ async function generateSVG() {
         currentSVGString = finalSVG;
         completeStep(4);
 
-        // Save to history
+        // Save to history (localStorage thumbnail)
         saveToHistory(petDesc, imageB64);
+
+        // Save full SVG to gallery (IndexedDB)
+        saveToGalleryDB(finalSVG);
 
         // Show results
         showResults(imageB64, finalSVG);
@@ -425,91 +428,137 @@ function buildFallbackSVG(dataURL, size) {
 function finalizeSVGForLaser(svgStr) {
     const sizeVal = document.getElementById('outputSize').value;
     const borderStyle = document.getElementById('borderStyle').value;
+    const clipShape = document.getElementById('clipShape')?.value || 'circle';
     const sizeNum = parseInt(sizeVal);
 
-    // Parse existing SVG
     const parser = new DOMParser();
     const svgDoc = parser.parseFromString(svgStr, 'image/svg+xml');
     const svg = svgDoc.querySelector('svg');
 
-    // Get original viewBox
-    const vb = svg.getAttribute('viewBox') || `0 0 800 800`;
+    const vb = svg.getAttribute('viewBox') || '0 0 800 800';
     const parts = vb.split(' ').map(Number);
-    const w = parts[2] || 800;
-    const h = parts[3] || 800;
+    const w = parts[2] || 800, h = parts[3] || 800;
     const cx = w / 2, cy = h / 2, r = Math.min(w, h) / 2;
 
-    // ── Fix fill colors: keep white areas white, turn everything else black ──
-    // ImageTracer outputs colors as 'rgb(R,G,B)' which varies in spacing/format
-    // Use luminance parsing instead of exact string comparison
+    // ── Fix fill colors (luminance-based) ────────────────────
     function parseColorLuminance(colorStr) {
         if (!colorStr) return -1;
         const s = colorStr.replace(/\s/g, '').toLowerCase();
         if (s === 'white') return 255;
         if (s === 'black') return 0;
         if (s === 'none') return -1;
-        // #fff or #ffffff
         const hex3 = s.match(/^#([0-9a-f])([0-9a-f])([0-9a-f])$/);
-        if (hex3) {
-            const r = parseInt(hex3[1] + hex3[1], 16), g = parseInt(hex3[2] + hex3[2], 16), b = parseInt(hex3[3] + hex3[3], 16);
-            return 0.299 * r + 0.587 * g + 0.114 * b;
-        }
+        if (hex3) { const rv = parseInt(hex3[1] + hex3[1], 16), gv = parseInt(hex3[2] + hex3[2], 16), bv = parseInt(hex3[3] + hex3[3], 16); return 0.299 * rv + 0.587 * gv + 0.114 * bv; }
         const hex6 = s.match(/^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/);
-        if (hex6) {
-            const r = parseInt(hex6[1], 16), g = parseInt(hex6[2], 16), b = parseInt(hex6[3], 16);
-            return 0.299 * r + 0.587 * g + 0.114 * b;
-        }
+        if (hex6) { const rv = parseInt(hex6[1], 16), gv = parseInt(hex6[2], 16), bv = parseInt(hex6[3], 16); return 0.299 * rv + 0.587 * gv + 0.114 * bv; }
         const rgb = s.match(/^rgba?\((\d+),(\d+),(\d+)/);
-        if (rgb) {
-            return 0.299 * parseInt(rgb[1]) + 0.587 * parseInt(rgb[2]) + 0.114 * parseInt(rgb[3]);
-        }
+        if (rgb) return 0.299 * parseInt(rgb[1]) + 0.587 * parseInt(rgb[2]) + 0.114 * parseInt(rgb[3]);
         return -1;
     }
-
     svg.querySelectorAll('[fill]').forEach(el => {
         const fill = el.getAttribute('fill');
         if (!fill || fill === 'none') return;
         const lum = parseColorLuminance(fill);
-        if (lum < 0) return; // unknown, keep as is
-        // Light colors (luminance > 180) → white; dark → black
+        if (lum < 0) return;
         el.setAttribute('fill', lum > 180 ? 'none' : '#000000');
     });
 
-    // Add circular clip & border
+    // ── Shape geometry builder ────────────────────────────────
     let defs = svg.querySelector('defs');
-    if (!defs) {
-        defs = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'defs');
-        svg.insertBefore(defs, svg.firstChild);
+    if (!defs) { defs = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'defs'); svg.insertBefore(defs, svg.firstChild); }
+
+    const clipId = 'laserShapeClip';
+    const rInner = r - 8;
+
+    function buildShapeGeometry(shape) {
+        switch (shape) {
+            case 'square': {
+                const s = rInner * 0.92;
+                return {
+                    clip: `<rect x="${cx - s}" y="${cy - s}" width="${s * 2}" height="${s * 2}" rx="12"/>`,
+                    borders: {
+                        single: `<rect x="${cx - s - 2}" y="${cy - s - 2}" width="${(s + 2) * 2}" height="${(s + 2) * 2}" rx="14" stroke-width="4" fill="none" stroke="#000"/>`,
+                        double: `<rect x="${cx - s - 2}" y="${cy - s - 2}" width="${(s + 2) * 2}" height="${(s + 2) * 2}" rx="14" stroke-width="5" fill="none" stroke="#000"/><rect x="${cx - s + 10}" y="${cy - s + 10}" width="${(s - 10) * 2}" height="${(s - 10) * 2}" rx="8" stroke-width="2" fill="none" stroke="#000"/>`,
+                        dotted: `<rect x="${cx - s - 2}" y="${cy - s - 2}" width="${(s + 2) * 2}" height="${(s + 2) * 2}" rx="14" stroke-width="4" stroke-dasharray="12,8" fill="none" stroke="#000"/>`,
+                    }
+                };
+            }
+            case 'hexagon': {
+                const hr = rInner;
+                const pts = Array.from({ length: 6 }, (_, i) => { const a = Math.PI / 180 * (60 * i - 30); return `${cx + hr * Math.cos(a)},${cy + hr * Math.sin(a)}`; }).join(' ');
+                const bpts = Array.from({ length: 6 }, (_, i) => { const a = Math.PI / 180 * (60 * i - 30); return `${cx + (hr + 4) * Math.cos(a)},${cy + (hr + 4) * Math.sin(a)}`; }).join(' ');
+                const bpts2 = Array.from({ length: 6 }, (_, i) => { const a = Math.PI / 180 * (60 * i - 30); return `${cx + (hr - 14) * Math.cos(a)},${cy + (hr - 14) * Math.sin(a)}`; }).join(' ');
+                return {
+                    clip: `<polygon points="${pts}"/>`,
+                    borders: {
+                        single: `<polygon points="${bpts}" stroke-width="4" fill="none" stroke="#000"/>`,
+                        double: `<polygon points="${bpts}" stroke-width="5" fill="none" stroke="#000"/><polygon points="${bpts2}" stroke-width="2" fill="none" stroke="#000"/>`,
+                        dotted: `<polygon points="${bpts}" stroke-width="4" stroke-dasharray="12,8" fill="none" stroke="#000"/>`,
+                    }
+                };
+            }
+            case 'diamond': {
+                const dr = rInner;
+                const pts = `${cx},${cy - dr} ${cx + dr * 0.75},${cy} ${cx},${cy + dr} ${cx - dr * 0.75},${cy}`;
+                const bpts = `${cx},${cy - dr - 4} ${cx + dr * 0.75 + 4},${cy} ${cx},${cy + dr + 4} ${cx - dr * 0.75 - 4},${cy}`;
+                return {
+                    clip: `<polygon points="${pts}"/>`,
+                    borders: {
+                        single: `<polygon points="${bpts}" stroke-width="4" fill="none" stroke="#000"/>`,
+                        double: `<polygon points="${bpts}" stroke-width="5" fill="none" stroke="#000"/><polygon points="${cx},${cy - dr + 12} ${cx + dr * 0.75 - 10},${cy} ${cx},${cy + dr - 12} ${cx - dr * 0.75 + 10},${cy}" stroke-width="2" fill="none" stroke="#000"/>`,
+                        dotted: `<polygon points="${bpts}" stroke-width="4" stroke-dasharray="10,7" fill="none" stroke="#000"/>`,
+                    }
+                };
+            }
+            case 'paw': {
+                const padRx = rInner * 0.52, padRy = rInner * 0.48, padCy = cy + rInner * 0.1, tr = rInner * 0.22;
+                const toes = [{ tx: cx - rInner * 0.42, ty: cy - rInner * 0.42 }, { tx: cx - rInner * 0.14, ty: cy - rInner * 0.58 }, { tx: cx + rInner * 0.14, ty: cy - rInner * 0.58 }, { tx: cx + rInner * 0.42, ty: cy - rInner * 0.42 }];
+                const toeClips = toes.map(t => `<ellipse cx="${t.tx}" cy="${t.ty}" rx="${tr}" ry="${tr * 0.88}"/>`).join('');
+                const toeBords = toes.map(t => `<ellipse cx="${t.tx}" cy="${t.ty}" rx="${tr + 3}" ry="${(tr + 3) * 0.88}" stroke-width="4" fill="none" stroke="#000"/>`).join('');
+                return {
+                    clip: `<ellipse cx="${cx}" cy="${padCy}" rx="${padRx}" ry="${padRy}"/>${toeClips}`,
+                    borders: {
+                        single: `<ellipse cx="${cx}" cy="${padCy}" rx="${padRx + 4}" ry="${padRy + 4}" stroke-width="4" fill="none" stroke="#000"/>${toeBords}`,
+                        double: `<ellipse cx="${cx}" cy="${padCy}" rx="${padRx + 4}" ry="${padRy + 4}" stroke-width="5" fill="none" stroke="#000"/><ellipse cx="${cx}" cy="${padCy}" rx="${padRx - 10}" ry="${padRy - 10}" stroke-width="2" fill="none" stroke="#000"/>${toeBords}`,
+                        dotted: `<ellipse cx="${cx}" cy="${padCy}" rx="${padRx + 4}" ry="${padRy + 4}" stroke-width="4" stroke-dasharray="10,7" fill="none" stroke="#000"/>`,
+                    }
+                };
+            }
+            case 'none':
+                return { clip: null, borders: { single: '', double: '', dotted: '' } };
+            case 'circle':
+            default:
+                return {
+                    clip: `<circle cx="${cx}" cy="${cy}" r="${rInner}"/>`,
+                    borders: {
+                        single: `<circle cx="${cx}" cy="${cy}" r="${r - 6}" stroke-width="4" fill="none" stroke="#000"/>`,
+                        double: `<circle cx="${cx}" cy="${cy}" r="${r - 4}" stroke-width="5" fill="none" stroke="#000"/><circle cx="${cx}" cy="${cy}" r="${r - 18}" stroke-width="2" fill="none" stroke="#000"/>`,
+                        dotted: `<circle cx="${cx}" cy="${cy}" r="${r - 6}" stroke-width="4" stroke-dasharray="12,8" fill="none" stroke="#000"/>`,
+                    }
+                };
+        }
     }
 
-    // ClipPath
-    const clipId = 'laserCircleClip';
-    defs.innerHTML += `<clipPath id="${clipId}"><circle cx="${cx}" cy="${cy}" r="${r - 8}"/></clipPath>`;
+    const { clip, borders } = buildShapeGeometry(clipShape);
 
-    // Wrap all content in a group with clip-path
-    const allContent = Array.from(svg.children).filter(el => el.tagName !== 'defs');
-    const g = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'g');
-    g.setAttribute('clip-path', `url(#${clipId})`);
-    allContent.forEach(el => g.appendChild(el));
-    svg.appendChild(g);
-
-    // Add borders
-    const borderGroup = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'g');
-    borderGroup.setAttribute('id', 'laser-border');
-    borderGroup.setAttribute('fill', 'none');
-    borderGroup.setAttribute('stroke', '#000000');
-
-    if (borderStyle === 'single') {
-        borderGroup.innerHTML = `<circle cx="${cx}" cy="${cy}" r="${r - 6}" stroke-width="4"/>`;
-    } else if (borderStyle === 'double') {
-        borderGroup.innerHTML = `
-      <circle cx="${cx}" cy="${cy}" r="${r - 4}" stroke-width="5"/>
-      <circle cx="${cx}" cy="${cy}" r="${r - 18}" stroke-width="2"/>`;
-    } else if (borderStyle === 'dotted') {
-        borderGroup.innerHTML = `<circle cx="${cx}" cy="${cy}" r="${r - 6}" stroke-width="4" stroke-dasharray="12,8"/>`;
+    // Apply clip
+    if (clip) {
+        defs.innerHTML += `<clipPath id="${clipId}">${clip}</clipPath>`;
+        const allContent = Array.from(svg.children).filter(el => el.tagName !== 'defs');
+        const g = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'g');
+        g.setAttribute('clip-path', `url(#${clipId})`);
+        allContent.forEach(el => g.appendChild(el));
+        svg.appendChild(g);
     }
 
-    if (borderStyle !== 'none') svg.appendChild(borderGroup);
+    // Apply border
+    if (borderStyle !== 'none') {
+        const borderGroup = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'g');
+        borderGroup.setAttribute('id', 'laser-border');
+        borderGroup.innerHTML = borders[borderStyle] || borders.single || '';
+        svg.appendChild(borderGroup);
+    }
+
 
     // ── Custom Text Banner (bottom of circle) ──────────
     const petName = (document.getElementById('petName')?.value || '').trim().toUpperCase();
@@ -681,6 +730,33 @@ function showError(msg) {
 
 function hideError() {
     document.getElementById('errorBox').style.display = 'none';
+}
+
+// ── Gallery (IndexedDB) ────────────────────────────────────
+function saveToGalleryDB(svgStr) {
+    try {
+        const DB_NAME = 'PawTraceGallery';
+        const STORE = 'svgs';
+        const req = indexedDB.open(DB_NAME, 1);
+        req.onupgradeneeded = e => {
+            const db = e.target.result;
+            if (!db.objectStoreNames.contains(STORE)) {
+                db.createObjectStore(STORE, { keyPath: 'id', autoIncrement: true });
+            }
+        };
+        req.onsuccess = e => {
+            const db = e.target.result;
+            const tx = db.transaction(STORE, 'readwrite');
+            const store = tx.objectStore(STORE);
+            store.add({
+                svg: svgStr,
+                style: currentStyle,
+                shape: document.getElementById('clipShape')?.value || 'circle',
+                petName: document.getElementById('petName')?.value?.trim() || '',
+                ts: Date.now()
+            });
+        };
+    } catch (e) { console.warn('Gallery DB save failed:', e.message); }
 }
 
 // ── History Recording ─────────────────────────────────

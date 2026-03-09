@@ -31,6 +31,7 @@
             <div class="nav-links">
                 <a href="#how-it-works">流程</a>
                 <a href="#laser-info">xTool 兼容</a>
+                <a href="gallery.html">🖼 画廊</a>
                 <a href="#generate" class="nav-cta">立即生成 →</a>
             </div>
         </div>
@@ -204,6 +205,17 @@
                     </select>
                 </div>
                 <div class="setting-item">
+                    <label>裁切形状</label>
+                    <select id="clipShape" class="select-input">
+                        <option value="circle" selected>⬤ 圆形（经典）</option>
+                        <option value="square">■ 正方形</option>
+                        <option value="hexagon">⬡ 六边形</option>
+                        <option value="paw">🐾 爪印形</option>
+                        <option value="diamond">◆ 菱形</option>
+                        <option value="none">⬜ 无裁切（完整图）</option>
+                    </select>
+                </div>
+                <div class="setting-item">
                     <label>对比度增强</label>
                     <select id="contrastLevel" class="select-input">
                         <option value="normal">标准</option>
@@ -214,9 +226,9 @@
                 <div class="setting-item">
                     <label>边框样式</label>
                     <select id="borderStyle" class="select-input">
-                        <option value="single">单圆圈</option>
-                        <option value="double" selected>双圆圈</option>
-                        <option value="dotted">点线圆圈</option>
+                        <option value="single">单线</option>
+                        <option value="double" selected>双线</option>
+                        <option value="dotted">点线</option>
                         <option value="none">无边框</option>
                     </select>
                 </div>

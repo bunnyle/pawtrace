@@ -160,6 +160,35 @@
             text-align: center;
         }
 
+        /* Tabs (Login / Register) */
+        .auth-tabs {
+            display: flex;
+            background: var(--bg);
+            border-radius: 12px;
+            padding: 4px;
+            margin-bottom: 24px;
+            gap: 4px;
+        }
+
+        .auth-tab {
+            flex: 1;
+            padding: 9px;
+            border: none;
+            border-radius: 9px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.88rem;
+            font-weight: 600;
+            cursor: pointer;
+            background: transparent;
+            color: var(--text-muted);
+            transition: background var(--transition), color var(--transition);
+        }
+
+        .auth-tab.active {
+            background: var(--surface2);
+            color: var(--text);
+        }
+
         /* Form */
         .form-group {
             margin-bottom: 20px;
@@ -318,180 +347,229 @@
 
         <!-- Card -->
         <div class="login-card">
-            <div class="mode-badge-wrap">
-                <span class="mode-badge" id="modeBadge">⚙️ 初始设置</span>
+            <!-- First-time setup mode badge -->
+            <div class="mode-badge-wrap" id="setupBadgeWrap" style="display:none">
+                <span class="mode-badge setup">⚙️ 初始设置 — 创建管理员账户</span>
             </div>
-            <h2 class="card-title" id="cardTitle">创建管理员账户</h2>
-            <p class="card-sub" id="cardSub">首次使用，请设置您的管理员用户名和密码</p>
+
+            <!-- Login / Register tabs (shown when users exist) -->
+            <div class="auth-tabs" id="authTabs" style="display:none">
+                <button class="auth-tab active" id="tabLogin" onclick="switchTab('login')">🔑 登录</button>
+                <button class="auth-tab" id="tabRegister" onclick="switchTab('register')">✨ 注册新账户</button>
+            </div>
 
             <div class="login-error" id="loginError"></div>
 
-            <form id="loginForm" onsubmit="handleSubmit(event)">
+            <!-- LOGIN FORM -->
+            <form id="loginForm" onsubmit="handleSubmit(event)" style="display:none">
                 <div class="form-group">
                     <label for="username">用户名</label>
                     <input type="text" id="username" class="form-input" placeholder="输入用户名" autocomplete="username"
                         required />
                 </div>
-                <div class="form-group" id="confirmGroup" style="display:none;">
-                    <label for="confirmUsername">确认用户名</label>
-                    <input type="text" id="confirmUsername" class="form-input" placeholder="再次输入用户名"
-                        autocomplete="username" />
-                </div>
                 <div class="form-group">
                     <label for="password">密码</label>
                     <div class="password-wrap">
-                        <input type="password" id="password" class="form-input" placeholder="输入密码（至少 8 位）"
+                        <input type="password" id="password" class="form-input" placeholder="输入密码"
                             autocomplete="current-password" required />
-                        <button type="button" class="toggle-pw" onclick="togglePassword()">👁</button>
+                        <button type="button" class="toggle-pw" onclick="togglePassword('password')">👁</button>
                     </div>
                 </div>
-                <div class="form-group" id="confirmPwGroup" style="display:none;">
-                    <label for="confirmPassword">确认密码</label>
-                    <div class="password-wrap">
-                        <input type="password" id="confirmPassword" class="form-input" placeholder="再次输入密码"
-                            autocomplete="new-password" />
-                        <button type="button" class="toggle-pw" onclick="togglePassword('confirmPassword')">👁</button>
-                    </div>
-                </div>
-                <button type="submit" class="btn-login" id="submitBtn">登录</button>
+                <button type="submit" class="btn-login" id="submitBtn">登录 →</button>
+                <p class="login-hint" style="margin-top:16px">
+                    忘记密码？<a href="javascript:resetAccount()">重置所有数据</a>
+                </p>
             </form>
 
-            <p class="login-hint" id="loginHint">
-                忘记密码？<a href="javascript:resetAccount()">重置所有数据</a>
-            </p>
+            <!-- SETUP FORM (first-time admin creation) -->
+            <form id="setupForm" onsubmit="handleSetupSubmit(event)" style="display:none">
+                <div class="form-group">
+                    <label>管理员用户名</label>
+                    <input type="text" id="setupUsername" class="form-input" placeholder="设置用户名" autocomplete="username"
+                        required />
+                </div>
+                <div class="form-group">
+                    <label>确认用户名</label>
+                    <input type="text" id="setupUsernameConfirm" class="form-input" placeholder="再次输入用户名"
+                        autocomplete="username" />
+                </div>
+                <div class="form-group">
+                    <label>密码（至少 8 位）</label>
+                    <div class="password-wrap">
+                        <input type="password" id="setupPassword" class="form-input" placeholder="设置密码"
+                            autocomplete="new-password" required />
+                        <button type="button" class="toggle-pw" onclick="togglePassword('setupPassword')">👁</button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>确认密码</label>
+                    <div class="password-wrap">
+                        <input type="password" id="setupPasswordConfirm" class="form-input" placeholder="再次输入密码"
+                            autocomplete="new-password" />
+                        <button type="button" class="toggle-pw"
+                            onclick="togglePassword('setupPasswordConfirm')">👁</button>
+                    </div>
+                </div>
+                <button type="submit" class="btn-login" id="setupBtn">创建管理员账户 →</button>
+            </form>
+
+            <!-- REGISTER FORM -->
+            <form id="registerForm" onsubmit="handleRegisterSubmit(event)" style="display:none">
+                <div class="form-group">
+                    <label>用户名</label>
+                    <input type="text" id="regUsername" class="form-input" placeholder="设置用户名（至少 2 位）"
+                        autocomplete="username" required />
+                </div>
+                <div class="form-group">
+                    <label>密码（至少 8 位）</label>
+                    <div class="password-wrap">
+                        <input type="password" id="regPassword" class="form-input" placeholder="设置密码"
+                            autocomplete="new-password" required />
+                        <button type="button" class="toggle-pw" onclick="togglePassword('regPassword')">👁</button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>确认密码</label>
+                    <div class="password-wrap">
+                        <input type="password" id="regPasswordConfirm" class="form-input" placeholder="再次输入密码"
+                            autocomplete="new-password" />
+                        <button type="button" class="toggle-pw"
+                            onclick="togglePassword('regPasswordConfirm')">👁</button>
+                    </div>
+                </div>
+                <button type="submit" class="btn-login">注册并登录 →</button>
+            </form>
         </div>
     </div>
 
     <script>
-        // ── Auth State ──────────────────────────────────
         const USERS_KEY = 'pawtrace_users';
         const SESSION_KEY = 'pawtrace_session';
 
-        // If already logged in, redirect to app
+        // If already logged in, redirect
         const existingSession = localStorage.getItem(SESSION_KEY);
         if (existingSession) {
-            const users = JSON.parse(localStorage.getItem(USERS_KEY) || '[]');
-            const session = JSON.parse(existingSession);
-            const user = users.find(u => u.username === session.username);
-            if (user && session.expires > Date.now()) {
-                window.location.href = 'index.html';
-            } else {
-                localStorage.removeItem(SESSION_KEY);
-            }
+            try {
+                const ses = JSON.parse(existingSession);
+                const us = JSON.parse(localStorage.getItem(USERS_KEY) || '[]');
+                if (us.find(u => u.username === ses.username) && ses.expires > Date.now()) {
+                    window.location.href = 'index.html';
+                } else { localStorage.removeItem(SESSION_KEY); }
+            } catch (e) { localStorage.removeItem(SESSION_KEY); }
         }
 
-        // Check if is first time setup or login mode
         const users = JSON.parse(localStorage.getItem(USERS_KEY) || '[]');
         const isSetup = users.length === 0;
 
-        if (!isSetup) {
-            // Login mode
-            document.getElementById('modeBadge').textContent = '🔑 账户登录';
-            document.getElementById('modeBadge').classList.remove('setup');
-            document.getElementById('modeBadge').classList.add('login');
-            document.getElementById('cardTitle').textContent = '欢迎回来';
-            document.getElementById('cardSub').textContent = '请登录您的 PawTrace AI 账户';
-            document.getElementById('submitBtn').textContent = '登录 →';
-            document.getElementById('loginHint').style.display = 'block';
+        // Show correct UI
+        if (isSetup) {
+            document.getElementById('setupBadgeWrap').style.display = 'block';
+            document.getElementById('setupForm').style.display = 'block';
         } else {
-            // Setup mode
-            document.getElementById('confirmGroup').style.display = 'block';
-            document.getElementById('confirmPwGroup').style.display = 'block';
-            document.getElementById('submitBtn').textContent = '创建账户 →';
-            document.getElementById('loginHint').style.display = 'none';
-            document.getElementById('password').placeholder = '设置密码（至少 8 位）';
+            document.getElementById('authTabs').style.display = 'flex';
+            document.getElementById('loginForm').style.display = 'block';
         }
 
-        // ── SHA-256 Hash ────────────────────────────────
-        async function sha256(message) {
-            const msgBuffer = new TextEncoder().encode(message);
-            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-            const hashArray = Array.from(new Uint8Array(hashBuffer));
-            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-        }
-
-        // ── Form Submit ─────────────────────────────────
-        async function handleSubmit(e) {
-            e.preventDefault();
-            const btn = document.getElementById('submitBtn');
-            btn.disabled = true;
-            btn.innerHTML = '<span class="spinner"></span>处理中...';
+        function switchTab(tab) {
             hideError();
-
-            const username = document.getElementById('username').value.trim();
-            const password = document.getElementById('password').value;
-
-            try {
-                if (isSetup) {
-                    await handleSetup(username, password);
-                } else {
-                    await handleLogin(username, password);
-                }
-            } catch (err) {
-                showError(err.message);
-                btn.disabled = false;
-                btn.textContent = isSetup ? '创建账户 →' : '登录 →';
-            }
+            document.getElementById('tabLogin').classList.toggle('active', tab === 'login');
+            document.getElementById('tabRegister').classList.toggle('active', tab === 'register');
+            document.getElementById('loginForm').style.display = tab === 'login' ? 'block' : 'none';
+            document.getElementById('registerForm').style.display = tab === 'register' ? 'block' : 'none';
         }
 
-        async function handleSetup(username, password) {
-            if (!username || username.length < 2) throw new Error('用户名至少需要 2 个字符');
-            if (password.length < 8) throw new Error('密码至少需要 8 位');
-
-            const confirmUsername = document.getElementById('confirmUsername').value.trim();
-            const confirmPassword = document.getElementById('confirmPassword').value;
-
-            if (username !== confirmUsername) throw new Error('两次输入的用户名不一致');
-            if (password !== confirmPassword) throw new Error('两次输入的密码不一致');
-
-            const hash = await sha256(password + username + 'pawtrace_salt');
-            const newUser = { username, hash, role: 'admin', createdAt: Date.now() };
-            localStorage.setItem(USERS_KEY, JSON.stringify([newUser]));
-
-            await createSession(username);
-            window.location.href = 'index.html';
-        }
-
-        async function handleLogin(username, password) {
-            const users = JSON.parse(localStorage.getItem(USERS_KEY) || '[]');
-            const hash = await sha256(password + username + 'pawtrace_salt');
-            const user = users.find(u => u.username === username && u.hash === hash);
-
-            if (!user) throw new Error('用户名或密码错误');
-
-            await createSession(username);
-
-            // Redirect: admin goes to admin, regular user goes to app
-            if (user.role === 'admin') {
-                window.location.href = 'index.html';
-            } else {
-                window.location.href = 'index.html';
-            }
+        // ── SHA-256 ──────────────────────────────────────
+        async function sha256(msg) {
+            const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(msg));
+            return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
         }
 
         async function createSession(username) {
-            const session = {
-                username,
-                expires: Date.now() + 7 * 24 * 60 * 60 * 1000 // 7 days
-            };
-            localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+            localStorage.setItem(SESSION_KEY, JSON.stringify({ username, expires: Date.now() + 7 * 24 * 60 * 60 * 1000 }));
         }
 
-        // ── UI Helpers ──────────────────────────────────
+        // ── Login ─────────────────────────────────────────
+        async function handleSubmit(e) {
+            e.preventDefault();
+            const btn = document.getElementById('submitBtn');
+            btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>验证中...';
+            hideError();
+            try {
+                const username = document.getElementById('username').value.trim();
+                const password = document.getElementById('password').value;
+                const hash = await sha256(password + username + 'pawtrace_salt');
+                const user = users.find(u => u.username === username && u.hash === hash);
+                if (!user) throw new Error('用户名或密码错误');
+                await createSession(username);
+                window.location.href = 'index.html';
+            } catch (err) {
+                showError(err.message);
+                btn.disabled = false; btn.textContent = '登录 →';
+            }
+        }
+
+        // ── First-time Setup ───────────────────────────────
+        async function handleSetupSubmit(e) {
+            e.preventDefault();
+            const btn = document.getElementById('setupBtn');
+            btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>创建中...';
+            hideError();
+            try {
+                const username = document.getElementById('setupUsername').value.trim();
+                const usernameC = document.getElementById('setupUsernameConfirm').value.trim();
+                const password = document.getElementById('setupPassword').value;
+                const passwordC = document.getElementById('setupPasswordConfirm').value;
+                if (username.length < 2) throw new Error('用户名至少 2 个字符');
+                if (username !== usernameC) throw new Error('两次用户名不一致');
+                if (password.length < 8) throw new Error('密码至少 8 位');
+                if (password !== passwordC) throw new Error('两次密码不一致');
+                const hash = await sha256(password + username + 'pawtrace_salt');
+                localStorage.setItem(USERS_KEY, JSON.stringify([{ username, hash, role: 'admin', createdAt: Date.now() }]));
+                await createSession(username);
+                window.location.href = 'index.html';
+            } catch (err) {
+                showError(err.message);
+                btn.disabled = false; btn.textContent = '创建管理员账户 →';
+            }
+        }
+
+        // ── Self Registration ─────────────────────────────
+        async function handleRegisterSubmit(e) {
+            e.preventDefault();
+            const btn = e.target.querySelector('button[type=submit]');
+            btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>注册中...';
+            hideError();
+            try {
+                const username = document.getElementById('regUsername').value.trim();
+                const password = document.getElementById('regPassword').value;
+                const passwordC = document.getElementById('regPasswordConfirm').value;
+                if (username.length < 2) throw new Error('用户名至少 2 个字符');
+                if (password.length < 8) throw new Error('密码至少 8 位');
+                if (password !== passwordC) throw new Error('两次密码不一致');
+                const existingUsers = JSON.parse(localStorage.getItem(USERS_KEY) || '[]');
+                if (existingUsers.find(u => u.username === username)) throw new Error('用户名已被使用');
+                const hash = await sha256(password + username + 'pawtrace_salt');
+                existingUsers.push({ username, hash, role: 'user', createdAt: Date.now() });
+                localStorage.setItem(USERS_KEY, JSON.stringify(existingUsers));
+                await createSession(username);
+                window.location.href = 'index.html';
+            } catch (err) {
+                showError(err.message);
+                btn.disabled = false; btn.textContent = '注册并登录 →';
+            }
+        }
+
         function showError(msg) {
             const el = document.getElementById('loginError');
-            el.textContent = '⚠️ ' + msg;
-            el.classList.add('show');
+            el.textContent = '⚠️ ' + msg; el.classList.add('show');
         }
-        function hideError() {
-            document.getElementById('loginError').classList.remove('show');
-        }
+        function hideError() { document.getElementById('loginError').classList.remove('show'); }
         function togglePassword(id = 'password') {
-            const input = document.getElementById(id);
-            input.type = input.type === 'password' ? 'text' : 'password';
+            const inp = document.getElementById(id);
+            inp.type = inp.type === 'password' ? 'text' : 'password';
         }
         function resetAccount() {
-            if (confirm('⚠️ 这将清除所有账户数据和历史记录。确认重置？')) {
+            if (confirm('⚠️ 这将清除所有账户数据和历史记录，确认重置？')) {
                 if (confirm('再次确认：所有数据将永久删除，无法恢复！')) {
                     ['pawtrace_users', 'pawtrace_session', 'pawtrace_history', 'pawtrace_apikey'].forEach(k => localStorage.removeItem(k));
                     window.location.reload();
@@ -502,3 +580,127 @@
 </body>
 
 </html>
+
+const existingSession = localStorage.getItem(SESSION_KEY);
+if (existingSession) {
+const users = JSON.parse(localStorage.getItem(USERS_KEY) || '[]');
+const session = JSON.parse(existingSession);
+const user = users.find(u => u.username === session.username);
+if (user && session.expires > Date.now()) {
+window.location.href = 'index.html';
+} else {
+localStorage.removeItem(SESSION_KEY);
+}
+}
+
+// Check if is first time setup or login mode
+const users = JSON.parse(localStorage.getItem(USERS_KEY) || '[]');
+const isSetup = users.length === 0;
+
+if (!isSetup) {
+// Login mode
+document.getElementById('modeBadge').textContent = '🔑 账户登录';
+document.getElementById('modeBadge').classList.remove('setup');
+document.getElementById('modeBadge').classList.add('login');
+document.getElementById('cardTitle').textContent = '欢迎回来';
+document.getElementById('cardSub').textContent = '请登录您的 PawTrace AI 账户';
+document.getElementById('submitBtn').textContent = '登录 →';
+document.getElementById('loginHint').style.display = 'block';
+} else {
+// Setup mode
+document.getElementById('confirmGroup').style.display = 'block';
+document.getElementById('confirmPwGroup').style.display = 'block';
+document.getElementById('submitBtn').textContent = '创建账户 →';
+document.getElementById('loginHint').style.display = 'none';
+document.getElementById('password').placeholder = '设置密码（至少 8 位）';
+}
+
+// ── SHA-256 Hash ────────────────────────────────
+async function sha256(message) {
+const msgBuffer = new TextEncoder().encode(message);
+const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+const hashArray = Array.from(new Uint8Array(hashBuffer));
+return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+// ── Form Submit ─────────────────────────────────
+async function handleSubmit(e) {
+e.preventDefault();
+const btn = document.getElementById('submitBtn');
+btn.disabled = true;
+btn.innerHTML = '<span class="spinner"></span>处理中...';
+hideError();
+
+const username = document.getElementById('username').value.trim();
+const password = document.getElementById('password').value;
+
+try {
+if (isSetup) {
+await handleSetup(username, password);
+} else {
+await handleLogin(username, password);
+}
+} catch (err) {
+showError(err.message);
+btn.disabled = false;
+btn.textContent = isSetup ? '创建账户 →' : '登录 →';
+}
+}
+
+async function handleSetup(username, password) {
+if (!username || username.length < 2) throw new Error('用户名至少需要 2 个字符'); if (password.length < 8) throw new Error('密码至少需要
+    8 位'); const confirmUsername=document.getElementById('confirmUsername').value.trim(); const
+    confirmPassword=document.getElementById('confirmPassword').value; if (username !==confirmUsername) throw new
+    Error('两次输入的用户名不一致'); if (password !==confirmPassword) throw new Error('两次输入的密码不一致'); const hash=await
+    sha256(password + username + 'pawtrace_salt' ); const newUser={ username, hash, role: 'admin' , createdAt:
+    Date.now() }; localStorage.setItem(USERS_KEY, JSON.stringify([newUser])); await createSession(username);
+    window.location.href='index.html' ; } async function handleLogin(username, password) { const
+    users=JSON.parse(localStorage.getItem(USERS_KEY) || '[]' ); const hash=await sha256(password + username
+    + 'pawtrace_salt' ); const user=users.find(u=> u.username === username && u.hash === hash);
+
+    if (!user) throw new Error('用户名或密码错误');
+
+    await createSession(username);
+
+    // Redirect: admin goes to admin, regular user goes to app
+    if (user.role === 'admin') {
+    window.location.href = 'index.html';
+    } else {
+    window.location.href = 'index.html';
+    }
+    }
+
+    async function createSession(username) {
+    const session = {
+    username,
+    expires: Date.now() + 7 * 24 * 60 * 60 * 1000 // 7 days
+    };
+    localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+    }
+
+    // ── UI Helpers ──────────────────────────────────
+    function showError(msg) {
+    const el = document.getElementById('loginError');
+    el.textContent = '⚠️ ' + msg;
+    el.classList.add('show');
+    }
+    function hideError() {
+    document.getElementById('loginError').classList.remove('show');
+    }
+    function togglePassword(id = 'password') {
+    const input = document.getElementById(id);
+    input.type = input.type === 'password' ? 'text' : 'password';
+    }
+    function resetAccount() {
+    if (confirm('⚠️ 这将清除所有账户数据和历史记录。确认重置？')) {
+    if (confirm('再次确认：所有数据将永久删除，无法恢复！')) {
+    ['pawtrace_users', 'pawtrace_session', 'pawtrace_history', 'pawtrace_apikey'].forEach(k =>
+    localStorage.removeItem(k));
+    window.location.reload();
+    }
+    }
+    }
+    </script>
+    </body>
+
+    </html>

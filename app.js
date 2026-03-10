@@ -9,7 +9,9 @@ let currentStyle = 'kawaii';
 let uploadedImageBase64 = null;
 let uploadedImageDataURL = null;
 let generatedImageB64 = null;
+let currentPrompt = '';
 let currentSVGString = null;
+let currentImageB64 = null;
 let apiKeyPanelOpen = false;
 
 // ── Init ───────────────────────────────────────
@@ -608,6 +610,7 @@ function finalizeSVGForLaser(svgStr) {
 
 // ── Show Results ───────────────────────────────
 function showResults(imageB64, svgStr) {
+    currentImageB64 = imageB64;
     // Set generated image preview
     document.getElementById('resultGenerated').src = `data:image/png;base64,${imageB64}`;
 
@@ -622,6 +625,52 @@ function showResults(imageB64, svgStr) {
     // Show section
     document.getElementById('resultsSection').style.display = 'block';
     document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ── Download Colored Image ──────────────────────
+async function downloadImage() {
+    if (!currentImageB64) {
+        alert('请先生成图片再下载 🙏');
+        return;
+    }
+
+    const filename = `pawtrace_color_${currentStyle}_${Date.now()}.png`;
+
+    const byteString = atob(currentImageB64);
+    const ab = new ArrayBuffer(byteString.length);
+    const ia = new Uint8Array(ab);
+    for (let i = 0; i < byteString.length; i++) {
+        ia[i] = byteString.charCodeAt(i);
+    }
+    const blob = new Blob([ab], { type: 'image/png' });
+
+    if (window.showSaveFilePicker) {
+        try {
+            const handle = await window.showSaveFilePicker({
+                suggestedName: filename,
+                types: [{
+                    description: 'PNG 彩色图片',
+                    accept: { 'image/png': ['.png'] }
+                }]
+            });
+            const writable = await handle.createWritable();
+            await writable.write(blob);
+            await writable.close();
+            return;
+        } catch (err) {
+            if (err.name === 'AbortError') return;
+            console.error(err);
+        }
+    }
+
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 100);
 }
 
 // ── Download SVG ────────────────────────────────

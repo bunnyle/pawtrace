@@ -805,7 +805,7 @@ body {
 
 .style-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(5, 1fr);
     gap: 16px;
 }
 
@@ -941,6 +941,27 @@ body {
 .floral-center {
     font-size: 1.4rem;
 }
+
+.watercolor-preview {
+    background: #E3F2FD;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.watercolor-blob {
+    width: 64px;
+    height: 64px;
+    border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+    background: linear-gradient(135deg, #90CAF9, #CE93D8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    box-shadow: 0 4px 15px rgba(144, 202, 249, 0.4);
+}
+
 
 .style-info {
     padding: 14px 16px;

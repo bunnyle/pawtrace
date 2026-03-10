@@ -537,34 +537,38 @@ function finalizeSVGForLaser(svgStr) {
 
     if (petName || tagline) {
         // Banner dimensions — bottom quarter of circle
-        const bannerH = r * 0.38;
-        const bannerY = cy + r - bannerH - 8;
+        const bannerH = r * 0.40;
+        const bannerY = cy + r - bannerH;
 
-        // White banner rectangle (clipped to circle via the same clip)
+        // White banner rectangle (clipped to circle via the same clip if needed, but here we just draw it)
         const bannerClipId = 'bannerClip';
-        defs.innerHTML += `<clipPath id="${bannerClipId}"><circle cx="${cx}" cy="${cy}" r="${r - 8}"/></clipPath>`;
+        defs.innerHTML += `<clipPath id="${bannerClipId}"><circle cx="${cx}" cy="${cy}" r="${r}"/></clipPath>`;
 
         const textGroup = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'g');
         textGroup.setAttribute('id', 'text-banner');
-        textGroup.setAttribute('clip-path', `url(#${bannerClipId})`);
 
-        // White background band
+        // Only clip to circle if it's a circular shape to maintain the border, otherwise just draw over
+        if (clipShape === 'circle') {
+            textGroup.setAttribute('clip-path', `url(#${bannerClipId})`);
+        }
+
+        // White background band - made wider and taller to fully cover the bottom section
         textGroup.innerHTML = `
-  <rect x="${cx - r + 8}" y="${bannerY}" width="${(r - 8) * 2}" height="${bannerH + 8}" fill="white"/>
-  <line x1="${cx - r + 8}" y1="${bannerY}" x2="${cx + r - 8}" y2="${bannerY}" stroke="#000" stroke-width="3"/>`;
+  <rect x="0" y="${bannerY}" width="${w}" height="${h - bannerY}" fill="white"/>
+  <line x1="0" y1="${bannerY}" x2="${w}" y2="${bannerY}" stroke="#000" stroke-width="4"/>`;
 
         // Pet name text
         if (petName) {
             const nameEl = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'text');
             nameEl.setAttribute('x', `${cx}`);
-            nameEl.setAttribute('y', `${bannerY + bannerH * (tagline ? 0.48 : 0.62)}`);
+            nameEl.setAttribute('y', `${bannerY + (h - bannerY) * (tagline ? 0.45 : 0.55)}`);
             nameEl.setAttribute('text-anchor', 'middle');
             nameEl.setAttribute('dominant-baseline', 'middle');
             nameEl.setAttribute('font-family', 'Arial, Helvetica, sans-serif');
             nameEl.setAttribute('font-weight', 'bold');
-            nameEl.setAttribute('font-size', `${Math.min(bannerH * 0.42, r * 0.18)}`);
+            nameEl.setAttribute('font-size', `${Math.min(bannerH * 0.45, r * 0.20)}`);
             nameEl.setAttribute('fill', '#000000');
-            nameEl.setAttribute('letter-spacing', '3');
+            nameEl.setAttribute('letter-spacing', '2');
             nameEl.textContent = petName;
             textGroup.appendChild(nameEl);
         }
@@ -573,12 +577,12 @@ function finalizeSVGForLaser(svgStr) {
         if (tagline) {
             const tagEl = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'text');
             tagEl.setAttribute('x', `${cx}`);
-            tagEl.setAttribute('y', `${bannerY + bannerH * (petName ? 0.78 : 0.55)}`);
+            tagEl.setAttribute('y', `${bannerY + (h - bannerY) * (petName ? 0.75 : 0.55)}`);
             tagEl.setAttribute('text-anchor', 'middle');
             tagEl.setAttribute('dominant-baseline', 'middle');
             tagEl.setAttribute('font-family', 'Georgia, Times New Roman, serif');
             tagEl.setAttribute('font-style', 'italic');
-            tagEl.setAttribute('font-size', `${Math.min(bannerH * 0.24, r * 0.1)}`);
+            tagEl.setAttribute('font-size', `${Math.min(bannerH * 0.25, r * 0.12)}`);
             tagEl.setAttribute('fill', '#333333');
             tagEl.textContent = tagline;
             textGroup.appendChild(tagEl);

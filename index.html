@@ -151,11 +151,8 @@
 
 
             <!-- UPLOAD -->
-            <div class="upload-zone" id="uploadZone" ondragover="handleDragOver(event)"
-                ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)"
-                onclick="document.getElementById('fileInput').click()">
-                <input type="file" id="fileInput" accept="image/*" style="display:none"
-                    onchange="handleFileSelect(event)" />
+            <div class="upload-zone" id="uploadZone">
+                <input type="file" id="fileInput" accept="image/*" style="display:none" />
                 <div class="upload-content" id="uploadContent">
                     <div class="upload-icon">📁</div>
                     <p class="upload-title">拖拽照片到这里，或点击上传</p>
@@ -172,7 +169,7 @@
             <div class="style-section-inner">
                 <h3 class="style-title">选择风格</h3>
                 <div class="style-grid">
-                    <div class="style-card active" id="style-kawaii" onclick="selectStyle('kawaii')">
+                    <div class="style-card active" id="style-kawaii">
                         <div class="style-preview kawaii-preview">
                             <div class="kawaii-face">
                                 <div class="k-eyes"><span>◉</span><span>◉</span></div>
@@ -185,7 +182,7 @@
                         </div>
                         <div class="style-check">✓</div>
                     </div>
-                    <div class="style-card" id="style-minimal" onclick="selectStyle('minimal')">
+                    <div class="style-card" id="style-minimal">
                         <div class="style-preview minimal-preview">
                             <div class="min-art">
                                 <div class="min-circle-big"></div>
@@ -199,7 +196,7 @@
                         </div>
                         <div class="style-check">✓</div>
                     </div>
-                    <div class="style-card" id="style-stamp" onclick="selectStyle('stamp')">
+                    <div class="style-card" id="style-stamp">
                         <div class="style-preview stamp-preview">
                             <div class="stamp-ring-demo">
                                 <span class="stamp-emoji">🐾</span>
@@ -211,7 +208,7 @@
                         </div>
                         <div class="style-check">✓</div>
                     </div>
-                    <div class="style-card" id="style-floral" onclick="selectStyle('floral')">
+                    <div class="style-card" id="style-floral">
                         <div class="style-preview floral-preview">
                             <div class="floral-ring">
                                 <span class="floral-center">🐱</span>
@@ -223,7 +220,7 @@
                         </div>
                         <div class="style-check">✓</div>
                     </div>
-                    <div class="style-card" id="style-watercolor" onclick="selectStyle('watercolor')">
+                    <div class="style-card" id="style-watercolor">
                         <div class="style-preview watercolor-preview">
                             <div class="watercolor-blob">🎨</div>
                         </div>
@@ -296,7 +293,7 @@
             </div>
 
             <div class="generate-area">
-                <button class="btn-generate" id="generateBtn" onclick="generateSVG()">
+                <button class="btn-generate" id="generateBtn">
                     <span class="btn-gen-icon">✨</span>
                     <span class="btn-gen-text">AI 生成 SVG</span>
                     <span class="btn-gen-sub">约需 15-30 秒</span>
@@ -342,7 +339,7 @@
                     <div class="result-label">🎨 AI 生成插画</div>
                     <div class="result-frame result-frame-ai"><img id="resultGenerated" src="" alt="AI生成图" /></div>
                     <div style="margin-top: 15px; text-align: center;">
-                        <button class="btn-ghost" onclick="downloadImage()" style="margin:0; width: 100%;">⬇️
+                        <button class="btn-ghost" id="btnDownloadImage" style="margin:0; width: 100%;">⬇️
                             下载彩色原图</button>
                     </div>
                 </div>
@@ -357,8 +354,8 @@
                         <span class="info-badge">黑白矢量</span>
                     </div>
                     <div class="download-row">
-                        <button class="btn-download" onclick="downloadSVG()">⬇️ 下载 SVG 文件</button>
-                        <button class="btn-regen" onclick="regenSVG()">🔄 重新生成</button>
+                        <button class="btn-download" id="btnDownloadSVG">⬇️ 下载 SVG 文件</button>
+                        <button class="btn-regen" id="btnRegenSVG">🔄 重新生成</button>
                     </div>
                 </div>
             </div>
@@ -446,7 +443,7 @@
 
     <canvas id="processingCanvas" style="display:none"></canvas>
     <script src="https://cdn.jsdelivr.net/npm/imagetracerjs@1.2.6/imagetracer_v1.2.6.js"></script>
-    <script src="app.js"></script>
+    <script type="module" src="app.js"></script>
 </body>
 
 </html>

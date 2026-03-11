@@ -13,18 +13,19 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
         :root {
-            --bg: #0D0D1A;
-            --surface: #141427;
-            --surface2: #1C1C35;
-            --border: rgba(199, 125, 255, 0.18);
-            --pink: #FF6B9D;
-            --purple: #C77DFF;
-            --teal: #00D4B1;
-            --yellow: #FFD166;
-            --text: #F0EEFF;
-            --text-muted: #8B87B0;
-            --radius: 20px;
-            --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --bg: #000000;
+            --surface: #1C1C1E;
+            --surface2: #2C2C2E;
+            --border: rgba(255, 255, 255, 0.15);
+            --pink: #0A84FF;
+            --purple: #5E5CE6;
+            --teal: #30D158;
+            --yellow: #FFD60A;
+            --text: #FFFFFF;
+            --text-muted: rgba(235, 235, 245, 0.6);
+            --radius: 18px;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            --transition: 0.3s cubic-bezier(0.25, 1, 0.5, 1);
         }
 
         * {
@@ -34,10 +35,11 @@
         }
 
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'SF Pro Text', sans-serif;
             background: var(--bg);
             color: var(--text);
             min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
         }
 
         /* Sidebar */
@@ -69,16 +71,13 @@
         }
 
         .sidebar-logo-text {
-            font-family: 'Nunito', sans-serif;
-            font-weight: 900;
+            font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
+            font-weight: 700;
             font-size: 1.1rem;
         }
 
         .logo-ai {
-            background: linear-gradient(90deg, var(--pink), var(--purple));
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: var(--text);
         }
 
         .admin-badge {
@@ -125,9 +124,9 @@
         }
 
         .nav-item.active {
-            background: linear-gradient(135deg, rgba(255, 107, 157, .15), rgba(199, 125, 255, .15));
+            background: rgba(255, 255, 255, 0.1);
             color: var(--text);
-            border: 1px solid rgba(199, 125, 255, .2);
+            border: 1px solid rgba(255, 255, 255, 0.15);
         }
 
         .nav-item .nav-icon {
@@ -156,13 +155,15 @@
             width: 32px;
             height: 32px;
             border-radius: 50%;
-            background: linear-gradient(135deg, var(--pink), var(--purple));
+            background: var(--surface2);
+            border: 1px solid rgba(255, 255, 255, 0.15);
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 0.85rem;
             font-weight: 700;
             flex-shrink: 0;
+            color: var(--text);
         }
 
         .user-name {
@@ -177,20 +178,20 @@
 
         .btn-logout {
             width: 100%;
-            background: rgba(255, 107, 157, .1);
-            border: 1px solid rgba(255, 107, 157, .2);
-            color: var(--pink);
+            background: rgba(255, 59, 48, 0.1);
+            border: 1px solid rgba(255, 59, 48, 0.2);
+            color: #FF3B30; /* Apple Red */
             border-radius: 10px;
             padding: 9px;
             cursor: pointer;
-            font-family: 'Inter', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
             font-size: 0.85rem;
             font-weight: 600;
             transition: background var(--transition);
         }
 
         .btn-logout:hover {
-            background: rgba(255, 107, 157, .2);
+            background: rgba(255, 59, 48, 0.2);
         }
 
         /* Main content */
@@ -204,8 +205,8 @@
         }
 
         .page-title {
-            font-family: 'Nunito', sans-serif;
-            font-weight: 900;
+            font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
+            font-weight: 700;
             font-size: 1.8rem;
         }
 
@@ -236,8 +237,8 @@
         }
 
         .stat-card-val {
-            font-family: 'Nunito', sans-serif;
-            font-weight: 900;
+            font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
+            font-weight: 700;
             font-size: 2rem;
             line-height: 1;
         }
@@ -305,8 +306,8 @@
         }
 
         .panel-title {
-            font-family: 'Nunito', sans-serif;
-            font-weight: 800;
+            font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
+            font-weight: 700;
             font-size: 1rem;
         }
 
@@ -471,12 +472,14 @@
             height: 36px;
             border-radius: 50%;
             flex-shrink: 0;
-            background: linear-gradient(135deg, var(--pink), var(--purple));
+            background: var(--surface2);
+            border: 1px solid rgba(255, 255, 255, 0.15);
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 700;
             font-size: .85rem;
+            color: var(--text);
         }
 
         .user-row-info {
@@ -544,15 +547,20 @@
 
         .btn-primary-sm {
             width: 100%;
-            background: linear-gradient(135deg, var(--pink), var(--purple));
+            background: var(--text);
             border: none;
-            color: #fff;
+            color: var(--bg);
             border-radius: 8px;
             padding: 9px;
             font-weight: 700;
             cursor: pointer;
-            font-family: 'Inter', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
             font-size: .85rem;
+            transition: transform var(--transition);
+        }
+
+        .btn-primary-sm:active {
+            transform: scale(0.97);
         }
 
         /* Section */

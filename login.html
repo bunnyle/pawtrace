@@ -12,17 +12,17 @@
         rel="stylesheet" />
     <style>
         :root {
-            --bg: #0D0D1A;
-            --surface: #141427;
-            --surface2: #1C1C35;
-            --border: rgba(199, 125, 255, 0.18);
-            --pink: #FF6B9D;
-            --purple: #C77DFF;
-            --teal: #00D4B1;
-            --text: #F0EEFF;
-            --text-muted: #8B87B0;
-            --radius: 20px;
-            --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --bg: #000000;
+            --surface: #1C1C1E;
+            --surface2: #2C2C2E;
+            --border: rgba(255, 255, 255, 0.15);
+            --pink: #0A84FF;
+            --purple: #5E5CE6;
+            --teal: #30D158;
+            --text: #FFFFFF;
+            --text-muted: rgba(235, 235, 245, 0.6);
+            --radius: 18px;
+            --transition: 0.3s cubic-bezier(0.25, 1, 0.5, 1);
         }
 
         * {
@@ -32,7 +32,7 @@
         }
 
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'SF Pro Text', sans-serif;
             background: var(--bg);
             color: var(--text);
             min-height: 100vh;
@@ -88,16 +88,14 @@
         }
 
         .logo-text {
-            font-family: 'Nunito', sans-serif;
-            font-weight: 900;
+            font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
+            font-weight: 800;
             font-size: 1.8rem;
+            letter-spacing: -0.02em;
         }
 
         .logo-ai {
-            background: linear-gradient(90deg, var(--pink), var(--purple));
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: var(--text);
         }
 
         .login-tagline {
@@ -116,7 +114,7 @@
         }
 
         .card-title {
-            font-family: 'Nunito', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
             font-weight: 800;
             font-size: 1.3rem;
             margin-bottom: 8px;
@@ -216,8 +214,7 @@
         }
 
         .form-input:focus {
-            border-color: var(--purple);
-            box-shadow: 0 0 0 3px rgba(199, 125, 255, 0.12);
+            border-color: var(--pink);
         }
 
         .form-input::placeholder {
@@ -248,18 +245,17 @@
 
         .btn-login {
             width: 100%;
-            background: linear-gradient(135deg, var(--pink), var(--purple));
-            color: #fff;
+            background: var(--text);
+            color: var(--bg);
             border: none;
-            border-radius: 12px;
+            border-radius: 999px;
             padding: 14px;
-            font-family: 'Nunito', sans-serif;
-            font-weight: 800;
+            font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
+            font-weight: 700;
             font-size: 1rem;
             cursor: pointer;
             margin-top: 8px;
             transition: opacity var(--transition), transform var(--transition);
-            box-shadow: 0 4px 24px rgba(255, 107, 157, 0.35);
         }
 
         .btn-login:hover {
@@ -268,7 +264,7 @@
         }
 
         .btn-login:active {
-            transform: translateY(0);
+            transform: scale(0.97);
         }
 
         .btn-login:disabled {
@@ -442,265 +438,7 @@
         </div>
     </div>
 
-    <script>
-        const USERS_KEY = 'pawtrace_users';
-        const SESSION_KEY = 'pawtrace_session';
-
-        // If already logged in, redirect
-        const existingSession = localStorage.getItem(SESSION_KEY);
-        if (existingSession) {
-            try {
-                const ses = JSON.parse(existingSession);
-                const us = JSON.parse(localStorage.getItem(USERS_KEY) || '[]');
-                if (us.find(u => u.username === ses.username) && ses.expires > Date.now()) {
-                    window.location.href = 'index.html';
-                } else { localStorage.removeItem(SESSION_KEY); }
-            } catch (e) { localStorage.removeItem(SESSION_KEY); }
-        }
-
-        const users = JSON.parse(localStorage.getItem(USERS_KEY) || '[]');
-        const isSetup = users.length === 0;
-
-        // Show correct UI
-        if (isSetup) {
-            document.getElementById('setupBadgeWrap').style.display = 'block';
-            document.getElementById('setupForm').style.display = 'block';
-        } else {
-            document.getElementById('authTabs').style.display = 'flex';
-            document.getElementById('loginForm').style.display = 'block';
-        }
-
-        function switchTab(tab) {
-            hideError();
-            document.getElementById('tabLogin').classList.toggle('active', tab === 'login');
-            document.getElementById('tabRegister').classList.toggle('active', tab === 'register');
-            document.getElementById('loginForm').style.display = tab === 'login' ? 'block' : 'none';
-            document.getElementById('registerForm').style.display = tab === 'register' ? 'block' : 'none';
-        }
-
-        // ── SHA-256 ──────────────────────────────────────
-        async function sha256(msg) {
-            const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(msg));
-            return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
-        }
-
-        async function createSession(username) {
-            localStorage.setItem(SESSION_KEY, JSON.stringify({ username, expires: Date.now() + 7 * 24 * 60 * 60 * 1000 }));
-        }
-
-        // ── Login ─────────────────────────────────────────
-        async function handleSubmit(e) {
-            e.preventDefault();
-            const btn = document.getElementById('submitBtn');
-            btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>验证中...';
-            hideError();
-            try {
-                const username = document.getElementById('username').value.trim();
-                const password = document.getElementById('password').value;
-                const hash = await sha256(password + username + 'pawtrace_salt');
-                const user = users.find(u => u.username === username && u.hash === hash);
-                if (!user) throw new Error('用户名或密码错误');
-                await createSession(username);
-                window.location.href = 'index.html';
-            } catch (err) {
-                showError(err.message);
-                btn.disabled = false; btn.textContent = '登录 →';
-            }
-        }
-
-        // ── First-time Setup ───────────────────────────────
-        async function handleSetupSubmit(e) {
-            e.preventDefault();
-            const btn = document.getElementById('setupBtn');
-            btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>创建中...';
-            hideError();
-            try {
-                const username = document.getElementById('setupUsername').value.trim();
-                const usernameC = document.getElementById('setupUsernameConfirm').value.trim();
-                const password = document.getElementById('setupPassword').value;
-                const passwordC = document.getElementById('setupPasswordConfirm').value;
-                if (username.length < 2) throw new Error('用户名至少 2 个字符');
-                if (username !== usernameC) throw new Error('两次用户名不一致');
-                if (password.length < 8) throw new Error('密码至少 8 位');
-                if (password !== passwordC) throw new Error('两次密码不一致');
-                const hash = await sha256(password + username + 'pawtrace_salt');
-                localStorage.setItem(USERS_KEY, JSON.stringify([{ username, hash, role: 'admin', createdAt: Date.now() }]));
-                await createSession(username);
-                window.location.href = 'index.html';
-            } catch (err) {
-                showError(err.message);
-                btn.disabled = false; btn.textContent = '创建管理员账户 →';
-            }
-        }
-
-        // ── Self Registration ─────────────────────────────
-        async function handleRegisterSubmit(e) {
-            e.preventDefault();
-            const btn = e.target.querySelector('button[type=submit]');
-            btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>注册中...';
-            hideError();
-            try {
-                const username = document.getElementById('regUsername').value.trim();
-                const password = document.getElementById('regPassword').value;
-                const passwordC = document.getElementById('regPasswordConfirm').value;
-                if (username.length < 2) throw new Error('用户名至少 2 个字符');
-                if (password.length < 8) throw new Error('密码至少 8 位');
-                if (password !== passwordC) throw new Error('两次密码不一致');
-                const existingUsers = JSON.parse(localStorage.getItem(USERS_KEY) || '[]');
-                if (existingUsers.find(u => u.username === username)) throw new Error('用户名已被使用');
-                const hash = await sha256(password + username + 'pawtrace_salt');
-                existingUsers.push({ username, hash, role: 'user', createdAt: Date.now() });
-                localStorage.setItem(USERS_KEY, JSON.stringify(existingUsers));
-                await createSession(username);
-                window.location.href = 'index.html';
-            } catch (err) {
-                showError(err.message);
-                btn.disabled = false; btn.textContent = '注册并登录 →';
-            }
-        }
-
-        function showError(msg) {
-            const el = document.getElementById('loginError');
-            el.textContent = '⚠️ ' + msg; el.classList.add('show');
-        }
-        function hideError() { document.getElementById('loginError').classList.remove('show'); }
-        function togglePassword(id = 'password') {
-            const inp = document.getElementById(id);
-            inp.type = inp.type === 'password' ? 'text' : 'password';
-        }
-        function resetAccount() {
-            if (confirm('⚠️ 这将清除所有账户数据和历史记录，确认重置？')) {
-                if (confirm('再次确认：所有数据将永久删除，无法恢复！')) {
-                    ['pawtrace_users', 'pawtrace_session', 'pawtrace_history', 'pawtrace_apikey'].forEach(k => localStorage.removeItem(k));
-                    window.location.reload();
-                }
-            }
-        }
-    </script>
+    <script src="login.js"></script>
 </body>
 
 </html>
-
-const existingSession = localStorage.getItem(SESSION_KEY);
-if (existingSession) {
-const users = JSON.parse(localStorage.getItem(USERS_KEY) || '[]');
-const session = JSON.parse(existingSession);
-const user = users.find(u => u.username === session.username);
-if (user && session.expires > Date.now()) {
-window.location.href = 'index.html';
-} else {
-localStorage.removeItem(SESSION_KEY);
-}
-}
-
-// Check if is first time setup or login mode
-const users = JSON.parse(localStorage.getItem(USERS_KEY) || '[]');
-const isSetup = users.length === 0;
-
-if (!isSetup) {
-// Login mode
-document.getElementById('modeBadge').textContent = '🔑 账户登录';
-document.getElementById('modeBadge').classList.remove('setup');
-document.getElementById('modeBadge').classList.add('login');
-document.getElementById('cardTitle').textContent = '欢迎回来';
-document.getElementById('cardSub').textContent = '请登录您的 PawTrace AI 账户';
-document.getElementById('submitBtn').textContent = '登录 →';
-document.getElementById('loginHint').style.display = 'block';
-} else {
-// Setup mode
-document.getElementById('confirmGroup').style.display = 'block';
-document.getElementById('confirmPwGroup').style.display = 'block';
-document.getElementById('submitBtn').textContent = '创建账户 →';
-document.getElementById('loginHint').style.display = 'none';
-document.getElementById('password').placeholder = '设置密码（至少 8 位）';
-}
-
-// ── SHA-256 Hash ────────────────────────────────
-async function sha256(message) {
-const msgBuffer = new TextEncoder().encode(message);
-const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-const hashArray = Array.from(new Uint8Array(hashBuffer));
-return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-}
-
-// ── Form Submit ─────────────────────────────────
-async function handleSubmit(e) {
-e.preventDefault();
-const btn = document.getElementById('submitBtn');
-btn.disabled = true;
-btn.innerHTML = '<span class="spinner"></span>处理中...';
-hideError();
-
-const username = document.getElementById('username').value.trim();
-const password = document.getElementById('password').value;
-
-try {
-if (isSetup) {
-await handleSetup(username, password);
-} else {
-await handleLogin(username, password);
-}
-} catch (err) {
-showError(err.message);
-btn.disabled = false;
-btn.textContent = isSetup ? '创建账户 →' : '登录 →';
-}
-}
-
-async function handleSetup(username, password) {
-if (!username || username.length < 2) throw new Error('用户名至少需要 2 个字符'); if (password.length < 8) throw new Error('密码至少需要
-    8 位'); const confirmUsername=document.getElementById('confirmUsername').value.trim(); const
-    confirmPassword=document.getElementById('confirmPassword').value; if (username !==confirmUsername) throw new
-    Error('两次输入的用户名不一致'); if (password !==confirmPassword) throw new Error('两次输入的密码不一致'); const hash=await
-    sha256(password + username + 'pawtrace_salt' ); const newUser={ username, hash, role: 'admin' , createdAt:
-    Date.now() }; localStorage.setItem(USERS_KEY, JSON.stringify([newUser])); await createSession(username);
-    window.location.href='index.html' ; } async function handleLogin(username, password) { const
-    users=JSON.parse(localStorage.getItem(USERS_KEY) || '[]' ); const hash=await sha256(password + username
-    + 'pawtrace_salt' ); const user=users.find(u=> u.username === username && u.hash === hash);
-
-    if (!user) throw new Error('用户名或密码错误');
-
-    await createSession(username);
-
-    // Redirect: admin goes to admin, regular user goes to app
-    if (user.role === 'admin') {
-    window.location.href = 'index.html';
-    } else {
-    window.location.href = 'index.html';
-    }
-    }
-
-    async function createSession(username) {
-    const session = {
-    username,
-    expires: Date.now() + 7 * 24 * 60 * 60 * 1000 // 7 days
-    };
-    localStorage.setItem(SESSION_KEY, JSON.stringify(session));
-    }
-
-    // ── UI Helpers ──────────────────────────────────
-    function showError(msg) {
-    const el = document.getElementById('loginError');
-    el.textContent = '⚠️ ' + msg;
-    el.classList.add('show');
-    }
-    function hideError() {
-    document.getElementById('loginError').classList.remove('show');
-    }
-    function togglePassword(id = 'password') {
-    const input = document.getElementById(id);
-    input.type = input.type === 'password' ? 'text' : 'password';
-    }
-    function resetAccount() {
-    if (confirm('⚠️ 这将清除所有账户数据和历史记录。确认重置？')) {
-    if (confirm('再次确认：所有数据将永久删除，无法恢复！')) {
-    ['pawtrace_users', 'pawtrace_session', 'pawtrace_history', 'pawtrace_apikey'].forEach(k =>
-    localStorage.removeItem(k));
-    window.location.reload();
-    }
-    }
-    }
-    </script>
-    </body>
-
-    </html>

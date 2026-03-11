@@ -162,8 +162,8 @@ function renderChart() {
         labels: ['Chibi 🌸', '简约 ✏️', '印章 🏮'],
         datasets: [{
             data: [counts.kawaii, counts.minimal, counts.stamp],
-            backgroundColor: ['rgba(255,107,157,.7)', 'rgba(199,125,255,.7)', 'rgba(255,209,102,.7)'],
-            borderColor: ['#FF6B9D', '#C77DFF', '#FFD166'],
+            backgroundColor: ['rgba(10, 132, 255, .7)', 'rgba(94, 92, 230, .7)', 'rgba(48, 209, 88, .7)'],
+            borderColor: ['#0A84FF', '#5E5CE6', '#30D158'],
             borderWidth: 2,
         }]
     };

@@ -131,8 +131,7 @@ async function generateSVG() {
     }
     const apiKey = getApiKey();
     if (!apiKey) {
-        showError('请先设置 Google AI Studio API Key 🔑');
-        document.getElementById('apiBody').style.display = 'block';
+        showError('请先在 ⚙️ 管理 页面设置您的 Google AI Studio API Key 🔑');
         return;
     }
 

@@ -212,7 +212,10 @@ function deleteApiKey() {
 
 // ── User Management ──────────────────────────────
 function loadUsers() {
-    const users = JSON.parse(localStorage.getItem(USERS_KEY) || '[]');
+    let users = [];
+    try { users = JSON.parse(localStorage.getItem(USERS_KEY) || '[]'); } catch (e) {}
+    if (!Array.isArray(users)) users = [];
+
     const list = document.getElementById('userList');
     list.innerHTML = '';
 

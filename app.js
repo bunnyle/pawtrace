@@ -17,26 +17,33 @@ let currentImageB64 = null;
 
 // ── Init ───────────────────────────────────────
 function init() {
-    // Session guard — redirect to login if no valid session
-    const sessionStr = localStorage.getItem('pawtrace_session');
-    if (sessionStr) {
-        const session = JSON.parse(sessionStr);
-        if (!session.username || session.expires < Date.now()) {
-            localStorage.removeItem('pawtrace_session');
-            window.location.href = 'login.html';
-            return;
-        }
-        addNavUserChip(session.username);
-    } else {
-        // Check if any users are registered; if so, require login
-        const users = JSON.parse(localStorage.getItem('pawtrace_users') || '[]');
-        if (users.length > 0) {
-            window.location.href = 'login.html';
-            return;
-        }
-    }
+    try {
+        // Session guard — redirect to login if no valid session
+        const sessionStr = localStorage.getItem('pawtrace_session');
+        if (sessionStr) {
+            const session = JSON.parse(sessionStr);
+            if (!session.username || session.expires < Date.now()) {
+                localStorage.removeItem('pawtrace_session');
+                window.location.href = 'login.html';
+                return;
+            }
+            try { addNavUserChip(session.username); } catch (e) { console.error("Nav chip error:", e); }
+        } else {
+            // Check if any users are registered; if so, require login
+            let users = [];
+            try { users = JSON.parse(localStorage.getItem('pawtrace_users') || '[]'); } catch (e) {}
+            if (!Array.isArray(users)) users = []; // Fix legacy schema where users was an object
 
-    bindDOMEvents();
+            if (users.length > 0) {
+                window.location.href = 'login.html';
+                return;
+            }
+        }
+    } catch (err) {
+        console.error("Initialization Error:", err);
+    } finally {
+        bindDOMEvents();
+    }
 }
 
 if (document.readyState === 'loading') {
@@ -342,7 +349,9 @@ function hideError() {
 function addNavUserChip(username) {
     const navLinks = document.querySelector('.nav-links');
     if (!navLinks) return;
-    const users = JSON.parse(localStorage.getItem('pawtrace_users') || '[]');
+    let users = [];
+    try { users = JSON.parse(localStorage.getItem('pawtrace_users') || '[]'); } catch (e) {}
+    if (!Array.isArray(users)) users = [];
     const user = users.find(u => u.username === username);
     const chip = document.createElement('div');
     chip.style.cssText = 'display:flex;align-items:center;gap:8px;';

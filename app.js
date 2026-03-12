@@ -15,6 +15,8 @@ let generatedImageB64 = null;
 let currentSVGString = null;
 let currentImageB64 = null;
 
+console.log("APP.JS LOADED: TOP LEVEL ACCESSED.");
+
 // ── Init ───────────────────────────────────────
 function init() {
     try {
@@ -125,9 +127,11 @@ function loadFile(file) {
 
 // ── Style Selection ────────────────────────────
 function selectStyle(style) {
+    console.log("selectStyle called with:", style);
     currentStyle = style;
     document.querySelectorAll('.style-card').forEach(c => c.classList.remove('active'));
     document.getElementById('style-' + style).classList.add('active');
+    console.log("Successfully set style-" + style + " to active.");
 }
 
 // ── Main Generation Pipeline ───────────────────

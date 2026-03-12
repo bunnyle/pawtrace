@@ -443,7 +443,16 @@
 
     <canvas id="processingCanvas" style="display:none"></canvas>
     <script src="https://cdn.jsdelivr.net/npm/imagetracerjs@1.2.6/imagetracer_v1.2.6.js"></script>
+    <script>
+        console.log("Inline script executed. Attempting to load app.js as module...");
+        window.addEventListener('error', function(e) {
+            console.error("Global error caught:", e.message, e.filename, e.lineno);
+        });
+    </script>
     <script type="module" src="app.js"></script>
+    <script type="module">
+        console.log("Inline module executed successfully.");
+    </script>
 </body>
 
 </html>

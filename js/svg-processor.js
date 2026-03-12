@@ -119,7 +119,7 @@ export function finalizeSVGForLaser(svgStr, options) {
         if (hex3) { const rv = parseInt(hex3[1] + hex3[1], 16), gv = parseInt(hex3[2] + hex3[2], 16), bv = parseInt(hex3[3] + hex3[3], 16); return 0.299 * rv + 0.587 * gv + 0.114 * bv; }
         const hex6 = s.match(/^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/);
         if (hex6) { const rv = parseInt(hex6[1], 16), gv = parseInt(hex6[2], 16), bv = parseInt(hex6[3], 16); return 0.299 * rv + 0.587 * gv + 0.114 * bv; }
-        const rgb = s.match(/^rgba?\\((\\d+),(\\d+),(\\d+)/);
+        const rgb = s.match(/^rgba?\((\d+),(\d+),(\d+)/);
         if (rgb) return 0.299 * parseInt(rgb[1]) + 0.587 * parseInt(rgb[2]) + 0.114 * parseInt(rgb[3]);
         return -1;
     }
@@ -143,52 +143,52 @@ export function finalizeSVGForLaser(svgStr, options) {
             case 'square': {
                 const s = rInner * 0.92;
                 return {
-                    clip: \`<rect x="\${cx - s}" y="\${cy - s}" width="\${s * 2}" height="\${s * 2}" rx="12"/>\`,
+                    clip: `<rect x="\${cx - s}" y="\${cy - s}" width="\${s * 2}" height="\${s * 2}" rx="12"/>`,
                     borders: {
-                        single: \`<rect x="\${cx - s - 2}" y="\${cy - s - 2}" width="\${(s + 2) * 2}" height="\${(s + 2) * 2}" rx="14" stroke-width="4" fill="none" stroke="#000"/>\`,
-                        double: \`<rect x="\${cx - s - 2}" y="\${cy - s - 2}" width="\${(s + 2) * 2}" height="\${(s + 2) * 2}" rx="14" stroke-width="5" fill="none" stroke="#000"/><rect x="\${cx - s + 10}" y="\${cy - s + 10}" width="\${(s - 10) * 2}" height="\${(s - 10) * 2}" rx="8" stroke-width="2" fill="none" stroke="#000"/>\`,
-                        dotted: \`<rect x="\${cx - s - 2}" y="\${cy - s - 2}" width="\${(s + 2) * 2}" height="\${(s + 2) * 2}" rx="14" stroke-width="4" stroke-dasharray="12,8" fill="none" stroke="#000"/>\`,
+                        single: `<rect x="\${cx - s - 2}" y="\${cy - s - 2}" width="\${(s + 2) * 2}" height="\${(s + 2) * 2}" rx="14" stroke-width="4" fill="none" stroke="#000"/>`,
+                        double: `<rect x="\${cx - s - 2}" y="\${cy - s - 2}" width="\${(s + 2) * 2}" height="\${(s + 2) * 2}" rx="14" stroke-width="5" fill="none" stroke="#000"/><rect x="\${cx - s + 10}" y="\${cy - s + 10}" width="\${(s - 10) * 2}" height="\${(s - 10) * 2}" rx="8" stroke-width="2" fill="none" stroke="#000"/>`,
+                        dotted: `<rect x="\${cx - s - 2}" y="\${cy - s - 2}" width="\${(s + 2) * 2}" height="\${(s + 2) * 2}" rx="14" stroke-width="4" stroke-dasharray="12,8" fill="none" stroke="#000"/>`,
                     }
                 };
             }
             case 'hexagon': {
                 const hr = rInner;
-                const pts = Array.from({ length: 6 }, (_, i) => { const a = Math.PI / 180 * (60 * i - 30); return \`\${cx + hr * Math.cos(a)},\${cy + hr * Math.sin(a)}\`; }).join(' ');
-                const bpts = Array.from({ length: 6 }, (_, i) => { const a = Math.PI / 180 * (60 * i - 30); return \`\${cx + (hr + 4) * Math.cos(a)},\${cy + (hr + 4) * Math.sin(a)}\`; }).join(' ');
-                const bpts2 = Array.from({ length: 6 }, (_, i) => { const a = Math.PI / 180 * (60 * i - 30); return \`\${cx + (hr - 14) * Math.cos(a)},\${cy + (hr - 14) * Math.sin(a)}\`; }).join(' ');
+                const pts = Array.from({ length: 6 }, (_, i) => { const a = Math.PI / 180 * (60 * i - 30); return `\${cx + hr * Math.cos(a)},\${cy + hr * Math.sin(a)}`; }).join(' ');
+                const bpts = Array.from({ length: 6 }, (_, i) => { const a = Math.PI / 180 * (60 * i - 30); return `\${cx + (hr + 4) * Math.cos(a)},\${cy + (hr + 4) * Math.sin(a)}`; }).join(' ');
+                const bpts2 = Array.from({ length: 6 }, (_, i) => { const a = Math.PI / 180 * (60 * i - 30); return `\${cx + (hr - 14) * Math.cos(a)},\${cy + (hr - 14) * Math.sin(a)}`; }).join(' ');
                 return {
-                    clip: \`<polygon points="\${pts}"/>\`,
+                    clip: `<polygon points="\${pts}"/>`,
                     borders: {
-                        single: \`<polygon points="\${bpts}" stroke-width="4" fill="none" stroke="#000"/>\`,
-                        double: \`<polygon points="\${bpts}" stroke-width="5" fill="none" stroke="#000"/><polygon points="\${bpts2}" stroke-width="2" fill="none" stroke="#000"/>\`,
-                        dotted: \`<polygon points="\${bpts}" stroke-width="4" stroke-dasharray="12,8" fill="none" stroke="#000"/>\`,
+                        single: `<polygon points="\${bpts}" stroke-width="4" fill="none" stroke="#000"/>`,
+                        double: `<polygon points="\${bpts}" stroke-width="5" fill="none" stroke="#000"/><polygon points="\${bpts2}" stroke-width="2" fill="none" stroke="#000"/>`,
+                        dotted: `<polygon points="\${bpts}" stroke-width="4" stroke-dasharray="12,8" fill="none" stroke="#000"/>`,
                     }
                 };
             }
             case 'diamond': {
                 const dr = rInner;
-                const pts = \`\${cx},\${cy - dr} \${cx + dr * 0.75},\${cy} \${cx},\${cy + dr} \${cx - dr * 0.75},\${cy}\`;
-                const bpts = \`\${cx},\${cy - dr - 4} \${cx + dr * 0.75 + 4},\${cy} \${cx},\${cy + dr + 4} \${cx - dr * 0.75 - 4},\${cy}\`;
+                const pts = `\${cx},\${cy - dr} \${cx + dr * 0.75},\${cy} \${cx},\${cy + dr} \${cx - dr * 0.75},\${cy}`;
+                const bpts = `\${cx},\${cy - dr - 4} \${cx + dr * 0.75 + 4},\${cy} \${cx},\${cy + dr + 4} \${cx - dr * 0.75 - 4},\${cy}`;
                 return {
-                    clip: \`<polygon points="\${pts}"/>\`,
+                    clip: `<polygon points="\${pts}"/>`,
                     borders: {
-                        single: \`<polygon points="\${bpts}" stroke-width="4" fill="none" stroke="#000"/>\`,
-                        double: \`<polygon points="\${bpts}" stroke-width="5" fill="none" stroke="#000"/><polygon points="\${cx},\${cy - dr + 12} \${cx + dr * 0.75 - 10},\${cy} \${cx},\${cy + dr - 12} \${cx - dr * 0.75 + 10},\${cy}" stroke-width="2" fill="none" stroke="#000"/>\`,
-                        dotted: \`<polygon points="\${bpts}" stroke-width="4" stroke-dasharray="10,7" fill="none" stroke="#000"/>\`,
+                        single: `<polygon points="\${bpts}" stroke-width="4" fill="none" stroke="#000"/>`,
+                        double: `<polygon points="\${bpts}" stroke-width="5" fill="none" stroke="#000"/><polygon points="\${cx},\${cy - dr + 12} \${cx + dr * 0.75 - 10},\${cy} \${cx},\${cy + dr - 12} \${cx - dr * 0.75 + 10},\${cy}" stroke-width="2" fill="none" stroke="#000"/>`,
+                        dotted: `<polygon points="\${bpts}" stroke-width="4" stroke-dasharray="10,7" fill="none" stroke="#000"/>`,
                     }
                 };
             }
             case 'paw': {
                 const padRx = rInner * 0.52, padRy = rInner * 0.48, padCy = cy + rInner * 0.1, tr = rInner * 0.22;
                 const toes = [{ tx: cx - rInner * 0.42, ty: cy - rInner * 0.42 }, { tx: cx - rInner * 0.14, ty: cy - rInner * 0.58 }, { tx: cx + rInner * 0.14, ty: cy - rInner * 0.58 }, { tx: cx + rInner * 0.42, ty: cy - rInner * 0.42 }];
-                const toeClips = toes.map(t => \`<ellipse cx="\${t.tx}" cy="\${t.ty}" rx="\${tr}" ry="\${tr * 0.88}"/>\`).join('');
-                const toeBords = toes.map(t => \`<ellipse cx="\${t.tx}" cy="\${t.ty}" rx="\${tr + 3}" ry="\${(tr + 3) * 0.88}" stroke-width="4" fill="none" stroke="#000"/>\`).join('');
+                const toeClips = toes.map(t => `<ellipse cx="\${t.tx}" cy="\${t.ty}" rx="\${tr}" ry="\${tr * 0.88}"/>`).join('');
+                const toeBords = toes.map(t => `<ellipse cx="\${t.tx}" cy="\${t.ty}" rx="\${tr + 3}" ry="\${(tr + 3) * 0.88}" stroke-width="4" fill="none" stroke="#000"/>`).join('');
                 return {
-                    clip: \`<ellipse cx="\${cx}" cy="\${padCy}" rx="\${padRx}" ry="\${padRy}"/>\${toeClips}\`,
+                    clip: `<ellipse cx="\${cx}" cy="\${padCy}" rx="\${padRx}" ry="\${padRy}"/>\${toeClips}`,
                     borders: {
-                        single: \`<ellipse cx="\${cx}" cy="\${padCy}" rx="\${padRx + 4}" ry="\${padRy + 4}" stroke-width="4" fill="none" stroke="#000"/>\${toeBords}\`,
-                        double: \`<ellipse cx="\${cx}" cy="\${padCy}" rx="\${padRx + 4}" ry="\${padRy + 4}" stroke-width="5" fill="none" stroke="#000"/><ellipse cx="\${cx}" cy="\${padCy}" rx="\${padRx - 10}" ry="\${padRy - 10}" stroke-width="2" fill="none" stroke="#000"/>\${toeBords}\`,
-                        dotted: \`<ellipse cx="\${cx}" cy="\${padCy}" rx="\${padRx + 4}" ry="\${padRy + 4}" stroke-width="4" stroke-dasharray="10,7" fill="none" stroke="#000"/>\`,
+                        single: `<ellipse cx="\${cx}" cy="\${padCy}" rx="\${padRx + 4}" ry="\${padRy + 4}" stroke-width="4" fill="none" stroke="#000"/>\${toeBords}`,
+                        double: `<ellipse cx="\${cx}" cy="\${padCy}" rx="\${padRx + 4}" ry="\${padRy + 4}" stroke-width="5" fill="none" stroke="#000"/><ellipse cx="\${cx}" cy="\${padCy}" rx="\${padRx - 10}" ry="\${padRy - 10}" stroke-width="2" fill="none" stroke="#000"/>\${toeBords}`,
+                        dotted: `<ellipse cx="\${cx}" cy="\${padCy}" rx="\${padRx + 4}" ry="\${padRy + 4}" stroke-width="4" stroke-dasharray="10,7" fill="none" stroke="#000"/>`,
                     }
                 };
             }
@@ -197,11 +197,11 @@ export function finalizeSVGForLaser(svgStr, options) {
             case 'circle':
             default:
                 return {
-                    clip: \`<circle cx="\${cx}" cy="\${cy}" r="\${rInner}"/>\`,
+                    clip: `<circle cx="\${cx}" cy="\${cy}" r="\${rInner}"/>`,
                     borders: {
-                        single: \`<circle cx="\${cx}" cy="\${cy}" r="\${r - 6}" stroke-width="4" fill="none" stroke="#000"/>\`,
-                        double: \`<circle cx="\${cx}" cy="\${cy}" r="\${r - 4}" stroke-width="5" fill="none" stroke="#000"/><circle cx="\${cx}" cy="\${cy}" r="\${r - 18}" stroke-width="2" fill="none" stroke="#000"/>\`,
-                        dotted: \`<circle cx="\${cx}" cy="\${cy}" r="\${r - 6}" stroke-width="4" stroke-dasharray="12,8" fill="none" stroke="#000"/>\`,
+                        single: `<circle cx="\${cx}" cy="\${cy}" r="\${r - 6}" stroke-width="4" fill="none" stroke="#000"/>`,
+                        double: `<circle cx="\${cx}" cy="\${cy}" r="\${r - 4}" stroke-width="5" fill="none" stroke="#000"/><circle cx="\${cx}" cy="\${cy}" r="\${r - 18}" stroke-width="2" fill="none" stroke="#000"/>`,
+                        dotted: `<circle cx="\${cx}" cy="\${cy}" r="\${r - 6}" stroke-width="4" stroke-dasharray="12,8" fill="none" stroke="#000"/>`,
                     }
                 };
         }
@@ -211,10 +211,10 @@ export function finalizeSVGForLaser(svgStr, options) {
 
     // Apply clip
     if (clip) {
-        defs.innerHTML += \`<clipPath id="\${clipId}">\${clip}</clipPath>\`;
+        defs.innerHTML += `<clipPath id="\${clipId}">\${clip}</clipPath>`;
         const allContent = Array.from(svg.children).filter(el => el.tagName !== 'defs');
         const g = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'g');
-        g.setAttribute('clip-path', \`url(#\${clipId})\`);
+        g.setAttribute('clip-path', `url(#\${clipId})`);
         allContent.forEach(el => g.appendChild(el));
         svg.appendChild(g);
     }
@@ -236,31 +236,31 @@ export function finalizeSVGForLaser(svgStr, options) {
 
         // White banner rectangle (clipped to circle via the same clip if needed, but here we just draw it)
         const bannerClipId = 'bannerClip';
-        defs.innerHTML += \`<clipPath id="\${bannerClipId}"><circle cx="\${cx}" cy="\${cy}" r="\${r}"/></clipPath>\`;
+        defs.innerHTML += `<clipPath id="\${bannerClipId}"><circle cx="\${cx}" cy="\${cy}" r="\${r}"/></clipPath>`;
 
         const textGroup = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'g');
         textGroup.setAttribute('id', 'text-banner');
 
         // Only clip to circle if it's a circular shape to maintain the border, otherwise just draw over
         if (clipShape === 'circle') {
-            textGroup.setAttribute('clip-path', \`url(#\${bannerClipId})\`);
+            textGroup.setAttribute('clip-path', `url(#\${bannerClipId})`);
         }
 
         // White background band - made wider and taller to fully cover the bottom section
-        textGroup.innerHTML = \`
+        textGroup.innerHTML = `
   <rect x="0" y="\${bannerY}" width="\${w}" height="\${h - bannerY}" fill="white"/>
-  <line x1="0" y1="\${bannerY}" x2="\${w}" y2="\${bannerY}" stroke="#000" stroke-width="4"/>\`;
+  <line x1="0" y1="\${bannerY}" x2="\${w}" y2="\${bannerY}" stroke="#000" stroke-width="4"/>`;
 
         // Pet name text
         if (petName) {
             const nameEl = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'text');
-            nameEl.setAttribute('x', \`\${cx}\`);
-            nameEl.setAttribute('y', \`\${bannerY + (h - bannerY) * (tagline ? 0.45 : 0.55)}\`);
+            nameEl.setAttribute('x', `\${cx}`);
+            nameEl.setAttribute('y', `\${bannerY + (h - bannerY) * (tagline ? 0.45 : 0.55)}`);
             nameEl.setAttribute('text-anchor', 'middle');
             nameEl.setAttribute('dominant-baseline', 'middle');
             nameEl.setAttribute('font-family', 'Arial, Helvetica, sans-serif');
             nameEl.setAttribute('font-weight', 'bold');
-            nameEl.setAttribute('font-size', \`\${Math.min(bannerH * 0.45, r * 0.20)}\`);
+            nameEl.setAttribute('font-size', `\${Math.min(bannerH * 0.45, r * 0.20)}`);
             nameEl.setAttribute('fill', '#000000');
             nameEl.setAttribute('letter-spacing', '2');
             nameEl.textContent = petName;
@@ -270,13 +270,13 @@ export function finalizeSVGForLaser(svgStr, options) {
         // Tagline text
         if (tagline) {
             const tagEl = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'text');
-            tagEl.setAttribute('x', \`\${cx}\`);
-            tagEl.setAttribute('y', \`\${bannerY + (h - bannerY) * (petName ? 0.75 : 0.55)}\`);
+            tagEl.setAttribute('x', `\${cx}`);
+            tagEl.setAttribute('y', `\${bannerY + (h - bannerY) * (petName ? 0.75 : 0.55)}`);
             tagEl.setAttribute('text-anchor', 'middle');
             tagEl.setAttribute('dominant-baseline', 'middle');
             tagEl.setAttribute('font-family', 'Georgia, Times New Roman, serif');
             tagEl.setAttribute('font-style', 'italic');
-            tagEl.setAttribute('font-size', \`\${Math.min(bannerH * 0.25, r * 0.12)}\`);
+            tagEl.setAttribute('font-size', `\${Math.min(bannerH * 0.25, r * 0.12)}`);
             tagEl.setAttribute('fill', '#333333');
             tagEl.textContent = tagline;
             textGroup.appendChild(tagEl);
@@ -286,14 +286,14 @@ export function finalizeSVGForLaser(svgStr, options) {
     }
 
     // Set proper dimensions for xTool (mm units)
-    svg.setAttribute('width', \`\${sizeNum}mm\`);
-    svg.setAttribute('height', \`\${sizeNum}mm\`);
+    svg.setAttribute('width', `\${sizeNum}mm`);
+    svg.setAttribute('height', `\${sizeNum}mm`);
     svg.setAttribute('viewBox', vb);
     svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
 
     // Add xTool metadata comment
     const comment = svgDoc.createComment(
-        \` PawTrace AI | xTool F2 Ultra | \${sizeNum}mm x \${sizeNum}mm | Generated \${new Date().toISOString()} \`
+        ` PawTrace AI | xTool F2 Ultra | \${sizeNum}mm x \${sizeNum}mm | Generated \${new Date().toISOString()} `
     );
     svg.insertBefore(comment, svg.firstChild);
 

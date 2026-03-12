@@ -100,6 +100,15 @@ function bindDOMEvents() {
     document.getElementById('btnDownloadImage')?.addEventListener('click', downloadImage);
     document.getElementById('btnDownloadSVG')?.addEventListener('click', downloadSVG);
     document.getElementById('btnRegenSVG')?.addEventListener('click', regenSVG);
+
+    // Material Mockup Tabs
+    document.querySelectorAll('.material-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            document.querySelectorAll('.material-tab').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            switchMaterial(tab.dataset.material);
+        });
+    });
 }
 
 // ── UI Helpers ─────────────────────────────────
@@ -127,11 +136,35 @@ function loadFile(file) {
 
 // ── Style Selection ────────────────────────────
 function selectStyle(style) {
-    console.log("selectStyle called with:", style);
     currentStyle = style;
     document.querySelectorAll('.style-card').forEach(c => c.classList.remove('active'));
     document.getElementById('style-' + style).classList.add('active');
-    console.log("Successfully set style-" + style + " to active.");
+}
+
+// ── Material Mockup ────────────────────────────
+const MATERIAL_CONFIG = {
+    wood:    { class: 'mat-wood',    caption: '🌲 桦木板 — 最受欢迎的雕刻材质，纹理细腻' },
+    leather: { class: 'mat-leather', caption: '🍂 真皮 — 皮革灼烧出暖棕色焦痕，高质感' },
+    metal:   { class: 'mat-metal',   caption: '✨ 铝板 — 哑光金属表面激光蚀刻，精准锐利' },
+};
+
+function switchMaterial(material) {
+    const bg = document.getElementById('mockupBg');
+    const caption = document.getElementById('mockupCaption');
+    if (!bg) return;
+    // Remove all mat-* classes
+    Object.values(MATERIAL_CONFIG).forEach(m => bg.classList.remove(m.class));
+    const cfg = MATERIAL_CONFIG[material] || MATERIAL_CONFIG.wood;
+    bg.classList.add(cfg.class);
+    if (caption) caption.textContent = cfg.caption;
+}
+
+function updateMockup(svgString) {
+    const overlay = document.getElementById('mockupSvgOverlay');
+    if (!overlay || !svgString) return;
+    overlay.innerHTML = svgString;
+    // Default to wood
+    switchMaterial('wood');
 }
 
 // ── Main Generation Pipeline ───────────────────
@@ -212,6 +245,9 @@ function showResults(imageB64, svgStr) {
     // Render SVG preview
     const svgFrame = document.getElementById('svgPreview');
     svgFrame.innerHTML = svgStr;
+
+    // Update Mockup
+    updateMockup(svgStr);
 
     // Update size badge
     const size = document.getElementById('outputSize').value;

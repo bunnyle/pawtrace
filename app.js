@@ -3,9 +3,9 @@
    Powered by Google Gemini API
 ───────────────────────────────────────────── */
 
-import { describePet, generateCuteArt } from './js/api.js';
-import { traceToSVG, finalizeSVGForLaser } from './js/svg-processor.js';
-import { saveToGalleryDB, saveToHistory } from './js/db.js';
+import { describePet, generateCuteArt } from './js/api.js?v=debug2';
+import { traceToSVG, finalizeSVGForLaser } from './js/svg-processor.js?v=debug2';
+import { saveToGalleryDB, saveToHistory } from './js/db.js?v=debug2';
 
 // ── State ──────────────────────────────────────
 let currentStyle = 'kawaii';
